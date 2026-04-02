@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>问问二狗</title>
-   <script src="https://npm.elemecdn.com/iztro/dist/index.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/iztro/dist/iztro.min.js"></script>
     <style>
         :root {
             --bg: #f4efe8; 
@@ -300,7 +300,6 @@ function goToStep2() {
 }
 
 function renderPan() {
-    // 【已优化】增加未加载库的拦截提示
     if (typeof iztro === 'undefined') {
         alert("军师的算法大脑正在从网络加载中，网络稍微有点慢，请刷新页面再试一次！");
         return;

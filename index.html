@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>问问二狗</title>
+    <title>二狗军师 - 不确定就问问二狗。</title>
     <script src="https://unpkg.com/iztro/dist/index.min.js"></script>
     <style>
         :root {
-            /* 意式极简配色：高级米杏底色，不锈钢边框，深邃黑文字 */
+            /* 意式极简配色 */
             --bg: #f4efe8; 
             --steel: #d2d2d7;
             --accent: #1d1d1f;
@@ -25,20 +25,20 @@
 
         /* 顶部品牌区 */
         header {
-            text-align: left; /* 强制大标题居左 */
+            text-align: left; 
             margin-bottom: 30px;
             padding-top: 10px;
         }
 
         header h1 {
-            font-size: 28px;
+            font-size: 40px; /* 标题放大 */
             letter-spacing: 2px;
             font-weight: 300;
             margin: 0;
         }
 
         header p {
-            font-size: 12px;
+            font-size: 14px;
             color: #888;
             letter-spacing: 1px;
             margin-top: 5px;
@@ -48,11 +48,17 @@
         .input-section {
             background: var(--glass);
             backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px); /* 兼容苹果 */
+            -webkit-backdrop-filter: blur(10px);
             border: 1px solid var(--steel);
             padding: 24px;
             margin-bottom: 20px;
             box-sizing: border-box;
+            animation: fadeIn 0.5s ease; /* 翻页淡入动画 */
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         label {
@@ -63,7 +69,6 @@
             text-transform: uppercase;
         }
 
-        /* 强制居左并统一表单样式 */
         input, select, textarea {
             width: 100%;
             background: transparent;
@@ -82,7 +87,6 @@
             box-sizing: border-box;
         }
 
-        /* 针对日期输入框的特殊强制居左处理 */
         input[type="date"] {
             display: flex;
             align-items: center;
@@ -90,8 +94,9 @@
         }
 
         textarea {
-            height: 60px;
+            height: 100px;
             resize: none;
+            font-size: 18px;
         }
 
         button {
@@ -100,7 +105,7 @@
             color: white;
             border: none;
             padding: 16px;
-            font-size: 14px;
+            font-size: 15px;
             letter-spacing: 2px;
             cursor: pointer;
             transition: opacity 0.3s;
@@ -118,7 +123,8 @@
             gap: 1px;
             background-color: var(--steel);
             border: 1px solid var(--steel);
-            margin-top: 30px;
+            margin-top: 20px;
+            animation: fadeIn 0.6s ease;
         }
 
         .palace {
@@ -133,7 +139,7 @@
         .palace-name {
             font-size: 12px;
             font-weight: bold;
-            color: #8b0000; /* 宫位名深红色点缀 */
+            color: #8b0000;
         }
 
         .stars {
@@ -176,100 +182,14 @@
 
 <header>
     <h1>二狗军师</h1>
-    <p>人生推演</p>
+    <p>不确定就问问二狗。</p>
 </header>
 
-<div class="input-section">
+<div id="step1" class="input-section">
     <label>出生日期</label>
     <input type="date" id="date" value="1995-01-01">
     
     <label>出生时辰</label>
     <select id="time">
         <option value="0">子时 (00:00-01:00)</option>
-        <option value="1">丑时 (01:00-03:00)</option>
-        <option value="2">寅时 (03:00-05:00)</option>
-        <option value="3">卯时 (05:00-07:00)</option>
-        <option value="4">辰时 (07:00-09:00)</option>
-        <option value="5">巳时 (09:00-11:00)</option>
-        <option value="6">午时 (11:00-13:00)</option>
-        <option value="7">未时 (13:00-15:00)</option>
-        <option value="8">申时 (15:00-17:00)</option>
-        <option value="9">酉时 (17:00-19:00)</option>
-        <option value="10">戌时 (19:00-21:00)</option>
-        <option value="11">亥时 (21:00-23:00)</option>
-    </select>
-
-    <label>出生城市</label>
-    <input type="text" id="city" placeholder="例如：杭州 或 浙江杭州">
-
-    <label>性别</label>
-    <select id="gender">
-        <option value="male">男</option>
-        <option value="female">女</option>
-    </select>
-
-    <label>你困惑的问题</label>
-    <textarea id="question" placeholder="例如：我要放弃高薪去卖包子吗？"></textarea>
-
-    <button onclick="renderPan()">请军师指点</button>
-</div>
-
-<div id="result-pan" style="display:none;">
-    </div>
-
-<script>
-function renderPan() {
-    const dateStr = document.getElementById('date').value;
-    const timeIdx = document.getElementById('time').value;
-    const city = document.getElementById('city').value;
-    const gender = document.getElementById('gender').value;
-    const question = document.getElementById('question').value;
-
-    if (!dateStr) {
-        alert("请选择生辰八字！");
-        return;
-    }
-
-    // 1. 调用算法
-    const astrolabe = iztro.astro.astrolabeBySolarDate(dateStr, parseInt(timeIdx), gender);
-    
-    // 2. 显示容器
-    const container = document.getElementById('result-pan');
-    container.style.display = 'grid';
-    container.innerHTML = ''; 
-
-    // 3. 渲染 12 宫
-    astrolabe.palaces.forEach((palace, index) => {
-        const div = document.createElement('div');
-        div.className = 'palace';
-        
-        // 星曜处理
-        const majorStars = palace.majorStars.map(s => `<span>${s.name}</span>`).join('');
-        
-        div.innerHTML = `
-            <div class="palace-name">${palace.name}</div>
-            <div class="stars">${majorStars}</div>
-            <div style="font-size:9px; color:#999; margin-top: auto;">${palace.decadal.range[0]}-${palace.decadal.range[1]}</div>
-        `;
-        container.appendChild(div);
-        
-        // 中间显示区
-        if(index === 3) {
-            const center = document.createElement('div');
-            center.className = 'center-box';
-            center.innerHTML = `
-                <div style="font-weight:bold; font-size:14px; margin-bottom: 4px;">${astrolabe.fiveElementsClass}局</div>
-                <div style="font-size:11px; color:#666;">📍 ${city || '未提供城市'}</div>
-                <div class="question-display">问：${question || '未设问'}</div>
-            `;
-            container.appendChild(center);
-        }
-    });
-    
-    // 自动滚动到底部看结果
-    container.scrollIntoView({ behavior: 'smooth', block: 'start' });
-}
-</script>
-
-</body>
-</html>
+        <option value="1">丑时 (01:00-03:00

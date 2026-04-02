@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>问问二狗</title>
+    <title>问问二狗。</title>
     <script src="https://unpkg.com/iztro/dist/index.min.js"></script>
     <style>
         :root {
@@ -25,13 +25,13 @@
 
         /* 顶部品牌区 */
         header {
-            text-align: left; 
+            text-align: center; 
             margin-bottom: 30px;
             padding-top: 10px;
         }
 
         header h1 {
-            font-size: 40px; /* 标题放大 */
+            font-size: 40px; 
             letter-spacing: 2px;
             font-weight: 300;
             margin: 0;
@@ -87,10 +87,12 @@
             box-sizing: border-box;
         }
 
-        input[type="date"] {
+        /* 针对日期时间输入框的处理 */
+        input[type="datetime-local"] {
             display: flex;
             align-items: center;
             justify-content: flex-start;
+            font-family: inherit;
         }
 
         textarea {
@@ -182,44 +184,28 @@
 
 <header>
     <h1>二狗军师</h1>
-    <p>不确定就问问二狗</p>
+    <p>不确定就问问二狗。</p>
 </header>
 
 <div id="step1" class="input-section">
-    <label>出生日期</label>
-    <input type="date" id="date" value="1995-01-01">
-    
-    <label>出生时辰</label>
-    <select id="time">
-        <option value="0">子时 (00:00-01:00)</option>
-        <option value="1">丑时 (01:00-03:00)</option>
-        <option value="2">寅时 (03:00-05:00)</option>
-        <option value="3">卯时 (05:00-07:00)</option>
-        <option value="4">辰时 (07:00-09:00)</option>
-        <option value="5">巳时 (09:00-11:00)</option>
-        <option value="6">午时 (11:00-13:00)</option>
-        <option value="7">未时 (13:00-15:00)</option>
-        <option value="8">申时 (15:00-17:00)</option>
-        <option value="9">酉时 (17:00-19:00)</option>
-        <option value="10">戌时 (19:00-21:00)</option>
-        <option value="11">亥时 (21:00-23:00)</option>
-    </select>
+    <label>出生时间 (日期与具体到几点)</label>
+    <input type="datetime-local" id="datetime" value="1995-01-01T12:00">
 
     <label>出生城市</label>
-    <input type="text" id="city" placeholder="例如：浙江杭州">
+    <input type="text" id="city" placeholder="例如：杭州 或 浙江杭州">
 
-    <label>性别</label>
+    <label>性别 (排盘必需)</label>
     <select id="gender">
-        <option value="male">男</option>
-        <option value="female">女</option>
+        <option value="male">乾 (男)</option>
+        <option value="female">坤 (女)</option>
     </select>
 
-    <button onclick="goToStep2()">准备好了</button>
+    <button onclick="goToStep2()">军师准备好了</button>
 </div>
 
 <div id="step2" class="input-section" style="display:none;">
     <label>请详细描述你的问题</label>
-    <textarea id="question" placeholder="例如：我适合放弃高薪去卖包子吗"></textarea>
+    <textarea id="question" placeholder="例如：今年事业运势如何？适合创业吗？"></textarea>
 
     <button onclick="renderPan()">请军师指点</button>
 </div>
@@ -230,9 +216,9 @@
 <script>
 // 从第一页进入第二页的逻辑
 function goToStep2() {
-    const dateStr = document.getElementById('date').value;
-    if (!dateStr) {
-        alert("请先选择出生日期！");
+    const datetimeVal = document.getElementById('datetime').value;
+    if (!datetimeVal) {
+        alert("请先选择出生时间！");
         return;
     }
     // 隐藏第一页，显示第二页
@@ -242,24 +228,31 @@ function goToStep2() {
 
 // 第二页点击排盘的逻辑
 function renderPan() {
-    const dateStr = document.getElementById('date').value;
-    const timeIdx = document.getElementById('time').value;
+    const datetimeVal = document.getElementById('datetime').value;
     const city = document.getElementById('city').value;
     const gender = document.getElementById('gender').value;
     const question = document.getElementById('question').value;
 
-    // 1. 隐藏输入框，准备显示排盘
+    // 1. 解析合并后的日期和时间
+    const parts = datetimeVal.split('T');
+    const dateStr = parts[0]; // 提取 YYYY-MM-DD
+    const hour = parseInt(parts[1].split(':')[0], 10); // 提取小时数 (0-23)
+    
+    // 2. 将 24 小时制转换为紫微斗数的 12 时辰索引 (0-11)
+    // 算法：子时(23点-1点)为0，丑时(1点-3点)为1，依此类推
+    const timeIdx = Math.floor((hour + 1) % 24 / 2);
+
+    // 3. 隐藏输入框，准备显示排盘
     document.getElementById('step2').style.display = 'none';
 
-    // 2. 调用算法
-    const astrolabe = iztro.astro.astrolabeBySolarDate(dateStr, parseInt(timeIdx), gender);
+    // 4. 调用算法排盘
+    const astrolabe = iztro.astro.astrolabeBySolarDate(dateStr, timeIdx, gender);
     
-    // 3. 显示容器
+    // 5. 显示容器并渲染
     const container = document.getElementById('result-pan');
     container.style.display = 'grid';
     container.innerHTML = ''; 
 
-    // 4. 渲染 12 宫
     astrolabe.palaces.forEach((palace, index) => {
         const div = document.createElement('div');
         div.className = 'palace';
@@ -276,9 +269,14 @@ function renderPan() {
         if(index === 3) {
             const center = document.createElement('div');
             center.className = 'center-box';
+            
+            // 将用户选择的具体时间(如 14:30)也显示在盘面上
+            const timeStr = parts[1]; 
+            
             center.innerHTML = `
                 <div style="font-weight:bold; font-size:14px; margin-bottom: 4px;">${astrolabe.fiveElementsClass}局</div>
                 <div style="font-size:11px; color:#666;">📍 ${city || '未提供城市'}</div>
+                <div style="font-size:10px; color:#999; margin-bottom: 4px;">生于: ${timeStr}</div>
                 <div class="question-display">问：${question || '未设问'}</div>
             `;
             container.appendChild(center);

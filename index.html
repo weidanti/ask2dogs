@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>二狗军师 - 紫微斗数</title>
+    <title>问问二狗</title>
     <script src="https://unpkg.com/iztro/dist/index.min.js"></script>
     <style>
         :root {
@@ -180,7 +180,7 @@
 </header>
 
 <div class="input-section">
-    <label>你的生辰八字</label>
+    <label>出生日期</label>
     <input type="date" id="date" value="1995-01-01">
     
     <label>出生时辰</label>
@@ -204,12 +204,12 @@
 
     <label>性别</label>
     <select id="gender">
-        <option value="male">乾 (男)</option>
-        <option value="female">坤 (女)</option>
+        <option value="male">男</option>
+        <option value="female">女</option>
     </select>
 
-    <label>你想问军师的问题</label>
-    <textarea id="question" placeholder="例如：今年事业运势如何？适合创业吗？"></textarea>
+    <label>你困惑的问题</label>
+    <textarea id="question" placeholder="例如：我要放弃高薪去卖包子吗？"></textarea>
 
     <button onclick="renderPan()">请军师指点</button>
 </div>

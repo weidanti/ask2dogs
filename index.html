@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>问问二狗</title>
-    <script src="https://unpkg.com/iztro/dist/index.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/iztro/dist/index.min.js"></script>
     <style>
         :root {
             --bg: #f4efe8; 
@@ -84,7 +84,6 @@
             box-sizing: border-box;
         }
 
-        /* 将省市选择框并排的一行布局 */
         .location-picker {
             display: flex;
             gap: 15px;
@@ -92,7 +91,7 @@
         }
 
         .location-picker select {
-            margin-bottom: 0; /* 抵消默认的下边距 */
+            margin-bottom: 0; 
             width: 50%;
         }
 
@@ -301,6 +300,12 @@ function goToStep2() {
 }
 
 function renderPan() {
+    // 【已优化】增加未加载库的拦截提示
+    if (typeof iztro === 'undefined') {
+        alert("军师的算法大脑正在从网络加载中，网络稍微有点慢，请刷新页面再试一次！");
+        return;
+    }
+
     try {
         const datetimeVal = document.getElementById('datetime').value;
         const province = document.getElementById('province').value;
@@ -345,7 +350,7 @@ function renderPan() {
             }
         });
     } catch (error) {
-        alert("军师技术故障：" + error.message);
+        alert("排盘运算出现了一点小问题：" + error.message);
     }
 }
 </script>

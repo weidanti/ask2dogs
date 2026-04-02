@@ -16,17 +16,17 @@
         input, select, textarea { width: 100%; background: transparent; border: none; border-bottom: 1px solid var(--steel); padding: 12px 0; margin-bottom: 24px; font-size: 16px; outline: none; color: var(--accent); border-radius: 0; }
         .location-picker { display: flex; gap: 15px; margin-bottom: 24px; }
         .location-picker select { width: 50%; margin-bottom: 0; }
-        textarea { height: 100px; resize: none; font-size: 18px; }
+        textarea { height: 120px; resize: none; font-size: 18px; border: 1px solid var(--steel); padding: 10px; background: #fff; }
         button { width: 100%; background: var(--accent); color: white; border: none; padding: 18px; font-size: 14px; letter-spacing: 2px; cursor: pointer; transition: all 0.3s; }
         button:active { opacity: 0.8; transform: scale(0.98); }
         #ai-response-container { display: none; background: #fff; padding: 35px 25px; border-top: 4px solid var(--accent); margin-top: 20px; }
         .greeting { font-weight: bold; font-size: 16px; margin-bottom: 20px; color: #8b0000; letter-spacing: 1px; }
         .answer-content { font-size: 15px; line-height: 2; color: #333; white-space: pre-wrap; text-align: justify; }
-        #private-referral { display: none; margin-top: 40px; padding: 30px 20px; border: 1px solid var(--steel); background: #fff; text-align: center; }
-        .wechat-box { display: inline-flex; align-items: center; gap: 10px; background: #f9f9f9; padding: 10px 20px; border: 1px solid #eee; cursor: pointer; }
+        #private-referral { display: none; margin-top: 40px; padding: 30px 20px; border: 1px dashed var(--steel); background: #fafafa; text-align: center; }
+        .wechat-box { display: inline-flex; align-items: center; gap: 10px; background: #fff; padding: 10px 20px; border: 1px solid #eee; cursor: pointer; margin-top: 10px; }
         .copy-btn { font-size: 11px; background: var(--accent); color: #fff; padding: 4px 8px; border-radius: 2px; }
         .loading { font-size: 13px; color: #999; text-align: center; padding: 40px; display: none; }
-        .sop-report { font-size: 14px; color: #444; border-bottom: 1px solid #eee; padding-bottom: 20px; margin-bottom: 20px; }
+        .sop-report { font-size: 14px; color: #444; border-bottom: 1px solid #eee; padding-bottom: 20px; margin-bottom: 20px; line-height: 1.8; }
     </style>
 </head>
 <body>
@@ -52,11 +52,11 @@
 <div id="step2" class="input-section" style="display:none;">
     <div id="quick-sop-report" class="sop-report"></div>
     <label>详细描述你的问题 / DETAILED QUESTION</label>
-    <textarea id="question" placeholder="越详细，能量建模越精准..."></textarea>
+    <textarea id="question" placeholder="建议输入具体事件、时间点或核心困惑..."></textarea>
     <button onclick="startAIEngine()">请军师指点 / CONSULT</button>
 </div>
 
-<div id="loading-msg" class="loading">正在调取流年磁场，进行深度物理建模...</div>
+<div id="loading-msg" class="loading">正在起卦扫描，调取流年磁场与物理黑洞...</div>
 
 <div id="ai-response-container">
     <div class="greeting">二狗军师曰：</div>
@@ -64,17 +64,19 @@
     
     <div id="private-referral">
         <div style="font-size: 12px; color: #999; margin-bottom: 15px;">进一步全盘物理建模或流月避险</div>
-        <p style="font-size: 15px; margin-bottom: 20px;">添加二狗军师微信</p>
+        <p style="font-size: 15px; margin-bottom: 5px; font-weight: bold;">添加二狗军师微信</p>
         <div class="wechat-box" onclick="copyWechat()">
             <span style="font-family: monospace; font-weight: bold; font-size: 18px;" id="wechatId">debut24</span>
             <span class="copy-btn" id="copyText">复制</span>
         </div>
+        <p style="font-size: 10px; color: #bbb; margin-top: 10px;">点击 ID 即可自动复制</p>
     </div>
 </div>
 
 <script>
-// 此处建议保留你之前的完整 cityData
-const cityData = {"北京":["东城区","西城区","朝阳区","海淀区"],"上海":["黄浦区","徐汇区","静安区","浦东新区"],"广东":["广州","深圳","珠海","东莞","佛山"],"浙江":["杭州","宁波","温州","嘉兴"],"江苏":["南京","苏州","无锡","常州"],"四川":["成都","绵阳","乐山"]};
+// 城市数据 (确保包含完整列表)
+const cityData = {"北京":["东城区","西城区","朝阳区","海淀区","丰台区","石景山区","通州区","顺义区","昌平区","大兴区"],"上海":["黄浦区","徐汇区","长宁区","静安区","普陀区","虹口区","杨浦区","闵行区","宝山区","嘉定区","浦东新区"],"广东":["广州","深圳","珠海","汕头","佛山","江门","湛江","茂名","肇庆","惠州","梅州","汕尾","河源","阳江","清远","东莞","中山","潮州","揭阳","云浮"],"浙江":["杭州","宁波","温州","嘉兴","湖州","绍兴","金华","衢州","舟山","台州","丽水"],"江苏":["南京","无锡","徐州","常州","苏州","南通","连云港","淮安","盐城","扬州","镇江","泰州","宿迁"],"四川":["成都","自贡","攀枝花","泸州","德阳","绵阳","广元","遂宁","内江","乐山","南充","眉山","宜宾","广安","达州","雅安","巴中","资阳"],"湖北":["武汉","黄石","十堰","宜昌","襄阳","鄂州","荆门","孝感","荆州","黄冈","咸宁","随州","恩施"],"福建":["福州","厦门","莆田","三明","泉州","漳州","南平","龙岩","宁德"]};
+
 const provinceSelect = document.getElementById('province');
 for(let p in cityData){ let opt=document.createElement('option'); opt.value=p; opt.innerHTML=p; provinceSelect.appendChild(opt); }
 function initCitySelect(){ const p=provinceSelect.value; const c=document.getElementById('city'); c.innerHTML='<option value="">城市</option>'; if(p && cityData[p]){ cityData[p].forEach(s=>{ let o=document.createElement('option'); o.value=s; o.innerHTML=s; c.appendChild(o); }); } }
@@ -87,31 +89,27 @@ function copyWechat() {
     });
 }
 
-let globalAstrolabe = null; // 存储排盘数据
+let globalAstrolabe = null;
 
-// 第二页逻辑：根据 SOP 生成初步分析
 function renderSOPReport() {
     const datetimeVal = document.getElementById('datetime').value;
     const province = provinceSelect.value;
-    const city = document.getElementById('city').value;
-    if(!datetimeVal || !province) return alert("请填全信息");
+    if(!datetimeVal || !province) return alert("请完整填写出生信息");
 
     const parts = datetimeVal.split('T');
     const timeIdx = Math.floor((parseInt(parts[1].split(':')[0], 10) + 1) % 24 / 2);
     const gender = document.getElementById('gender').value;
     globalAstrolabe = iztro.astro.bySolar(parts[0], timeIdx, gender, true, 'zh-CN');
 
-    // 扫描关键宫位
     const ming = globalAstrolabe.palaces.find(p => p.name === '命宫');
-    const shen = globalAstrolabe.bodyPalace;
     const laiin = globalAstrolabe.palaces.find(p => p.isComingPalace)?.name;
     const guan = globalAstrolabe.palaces.find(p => p.name === '官禄宫');
     const cai = globalAstrolabe.palaces.find(p => p.name === '财帛宫');
 
     let reportHtml = `<strong>军师初步扫描：</strong><br><br>`;
-    reportHtml += `• 能量发端：来因在【${laiin}】，主导一生核心驱动力。<br>`;
-    reportHtml += `• 物理底色：命宫【${ming.earthlyBranch}】位，主星[${ming.majorStars.map(s=>s.name).join('、')||'空'}]。性格初速已定。<br>`;
-    reportHtml += `• 事业/财帛物理背景：官禄位坐[${guan.majorStars.map(s=>s.name).join('、')}]，财帛位坐[${cai.majorStars.map(s=>s.name).join('、')}]。`;
+    reportHtml += `• 能量发端：来因在【${laiin}】，主导一生核心驱动物理背景。<br>`;
+    reportHtml += `• 命局底色：命宫位于【${ming.earthlyBranch}】，主星[${ming.majorStars.map(s=>s.name).join('、')||'空'}]。物理初速已定。<br>`;
+    reportHtml += `• 重点领域：官禄位坐[${guan.majorStars.map(s=>s.name).join('、')}]，财帛位坐[${cai.majorStars.map(s=>s.name).join('、')}]。`;
 
     document.getElementById('quick-sop-report').innerHTML = reportHtml;
     document.getElementById('step1').style.display = 'none';
@@ -130,29 +128,28 @@ async function startAIEngine() {
         globalAstrolabe.palaces.forEach(p => {
             const ms = p.majorStars.map(s => s.name + (s.mutagen ? `[生年${s.mutagen}]` : '')).join('、');
             const ns = p.minorStars.map(s => s.name).join('、');
-            chartData += `- ${p.name}(${p.earthlyBranch}): [${ms||'空'}] + [${ns}]，长生[${p.changsheng12}]，大限[${p.decadal.range[0]}-${p.decadal.range[1]}]\n`;
+            chartData += `- ${p.name}(${p.earthlyBranch}): [${ms||'空'}] + [${ns}]，大限[${p.decadal.range[0]}-${p.decadal.range[1]}]\n`;
         });
 
-        // 终极 SOP 注入
-        const systemPrompt = `你现在是“二狗军师”，顶级战略顾问。严格遵守物理环境论、化忌本质论、煞星工具化。
+        const systemPrompt = `你现在是顶级战略顾问“二狗军师”。严格遵守：物理环境论、化忌本质论、煞星工具化。
 禁止废话和温情鼓励。
-输出要求：
+输出结构：
 1. 命局底色（1段）：分析物理天花板。
 2. 傲人优势（1段）：基于星曜互涉效应。
 3. 黑洞风险（1段）：基于生年忌与能量黑洞。
 4. 时间窗口（1段）：十年大运总结(1句) + 流年总结(1句) + 针对问题的时空推演。
-5. 破局指令（1段）：2-3点硬核执行建议。
-字数1000字以内，书信体，专业且一针见血。`;
+5. 破局指令（1段）：硬核执行建议。
+字数1000字以内，书信体，专业且一针见血。末尾自然提到如需深度建模可私聊。`;
 
-        // ⚠️ 填入你的 API KEY
-        const API_KEY = "YOUR_DEEPSEEK_API_KEY";
+        // API Key 已填入
+        const API_KEY = "sk-e929f9505b6742afbf1826936dcec69a";
 
         const response = await fetch("https://api.deepseek.com/chat/completions", {
             method: "POST",
             headers: { "Content-Type": "application/json", "Authorization": `Bearer ${API_KEY}` },
             body: JSON.stringify({
                 model: "deepseek-chat",
-                messages: [{role:"system", content:systemPrompt}, {role:"user", content:`用户问题：${question}\n命盘数据：${chartData}`}]
+                messages: [{role:"system", content:systemPrompt}, {role:"user", content:`问题：${question}\n数据：${chartData}`}]
             })
         });
 
@@ -168,7 +165,7 @@ async function startAIEngine() {
             if (i < aiAnswer.length) {
                 content.innerHTML += aiAnswer.charAt(i);
                 i++;
-                setTimeout(typeWriter, 35);
+                setTimeout(typeWriter, 30);
             } else {
                 document.getElementById('private-referral').style.display = 'block';
             }
@@ -176,7 +173,7 @@ async function startAIEngine() {
         typeWriter();
 
     } catch (error) {
-        alert("咨询失败：" + error.message);
+        alert("起卦失败，请检查网络或 API 余额：" + error.message);
         document.getElementById('step2').style.display = 'block';
     }
 }

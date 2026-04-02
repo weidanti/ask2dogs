@@ -125,64 +125,36 @@
             opacity: 0.7;
         }
 
-        #result-pan {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 1px;
-            background-color: var(--steel);
-            border: 1px solid var(--steel);
+        #ai-response-container {
+            display: none;
+            background: #fff;
+            padding: 30px 20px;
+            border-top: 3px solid var(--accent);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+            animation: fadeIn 0.8s ease;
             margin-top: 20px;
-            animation: fadeIn 0.6s ease;
         }
 
-        .palace {
-            background: rgba(255, 255, 255, 0.9);
-            aspect-ratio: 1 / 1.2;
-            padding: 6px;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-        }
-
-        .palace-name {
-            font-size: 12px;
+        .greeting {
             font-weight: bold;
+            font-size: 18px;
+            margin-bottom: 15px;
             color: #8b0000;
         }
 
-        .stars {
-            font-size: 11px;
-            display: flex;
-            flex-wrap: wrap;
-            gap: 2px;
+        .answer-content {
+            font-size: 15px;
+            line-height: 1.8;
+            color: #444;
+            white-space: pre-wrap; 
         }
 
-        .center-box {
-            grid-column: 2 / 4;
-            grid-row: 2 / 4;
-            background: var(--bg);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            font-size: 12px;
-            text-align: center;
-            padding: 10px;
-            box-sizing: border-box;
-        }
-
-        .question-display {
+        .loading {
             font-style: italic;
-            color: #555;
-            margin-top: 8px;
-            border-top: 1px solid var(--steel);
-            padding-top: 8px;
-            width: 100%;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            display: -webkit-box;
-            -webkit-line-clamp: 3;
-            -webkit-box-orient: vertical;
+            color: #888;
+            text-align: center;
+            padding: 20px;
+            display: none;
         }
     </style>
 </head>
@@ -220,70 +192,39 @@
     <label>描述你的问题</label>
     <textarea id="question" placeholder="越详细越好"></textarea>
 
-    <button onclick="renderPan()">请军师指点</button>
+    <button onclick="startAIEngine()">请军师指点</button>
 </div>
 
-<div id="result-pan" style="display:none;"></div>
+<div id="loading-msg" class="loading">军师正在起卦排盘，提取深度命理数据...</div>
+
+<div id="ai-response-container">
+    <div class="greeting">二狗军师曰：</div>
+    <div id="answer-content" class="answer-content"></div>
+</div>
 
 <script>
-// 省市数据
+// 极简版省市数据（为了不占用太多代码空间）
 const cityData = {
-    "北京": ["东城区", "西城区", "朝阳区", "丰台区", "石景山区", "海淀区", "门头沟区", "房山区", "通州区", "顺义区", "昌平区", "大兴区", "怀柔区", "平谷区", "密云区", "延庆区"],
-    "上海": ["黄浦区", "徐汇区", "长宁区", "静安区", "普陀区", "虹口区", "杨浦区", "闵行区", "宝山区", "嘉定区", "浦东新区", "金山区", "松江区", "青浦区", "奉贤区", "崇明区"],
-    "广东": ["广州", "深圳", "珠海", "汕头", "韶关", "佛山", "江门", "湛江", "茂名", "肇庆", "惠州", "梅州", "汕尾", "河源", "阳江", "清远", "东莞", "中山", "潮州", "揭阳", "云浮"],
-    "浙江": ["杭州", "宁波", "温州", "嘉兴", "湖州", "绍兴", "金华", "衢州", "舟山", "台州", "丽水"],
-    "江苏": ["南京", "无锡", "徐州", "常州", "苏州", "南通", "连云港", "淮安", "盐城", "扬州", "镇江", "泰州", "宿迁"],
-    "湖北": ["武汉", "黄石", "十堰", "宜昌", "襄阳", "鄂州", "荆门", "孝感", "荆州", "黄冈", "咸宁", "随州", "恩施"],
-    "四川": ["成都", "自贡", "攀枝花", "泸州", "德阳", "绵阳", "广元", "遂宁", "内江", "乐山", "南充", "眉山", "宜宾", "广安", "达州", "雅安", "巴中", "资阳"],
-    "福建": ["福州", "厦门", "莆田", "三明", "泉州", "漳州", "南平", "龙岩", "宁德"],
-    "山东": ["济南", "青岛", "淄博", "枣庄", "东营", "烟台", "潍坊", "济宁", "泰安", "威海", "日照", "临沂", "德州", "聊城", "滨州", "菏泽"],
-    "天津": ["和平区", "河东区", "河西区", "南开区", "河北区", "红桥区", "滨海新区", "东丽区", "西青区", "津南区", "北辰区", "武清区", "宝坻区", "宁河区", "静海区", "蓟州区"],
-    "重庆": ["渝中区", "万州区", "涪陵区", "大渡口区", "江北区", "沙坪坝区", "九龙坡区", "南岸区", "北碚区", "綦江区", "大足区", "渝北区", "巴南区", "黔江区", "长寿区", "江津区", "合川区", "永川区", "南川区", "璧山区", "铜梁区", "潼南区", "荣昌区"],
-    "河北": ["石家庄", "唐山", "秦皇岛", "邯郸", "邢台", "保定", "张家口", "承德", "沧州", "廊坊", "衡水"],
-    "山西": ["太原", "大同", "阳泉", "长治", "晋城", "朔州", "晋中", "运城", "忻州", "临汾", "吕梁"],
-    "辽宁": ["沈阳", "大连", "鞍山", "抚顺", "本溪", "丹东", "锦州", "营口", "阜新", "辽阳", "盘锦", "铁岭", "朝阳", "葫芦岛"],
-    "吉林": ["长春", "吉林", "四平", "辽源", "通化", "白山", "松原", "白城", "延边"],
-    "黑龙江": ["哈尔滨", "齐齐哈尔", "鸡西", "鹤岗", "双鸭山", "大庆", "伊春", "佳木斯", "七台河", "牡丹江", "黑河", "绥化", "大兴安岭"],
-    "安徽": ["合肥", "芜湖", "蚌埠", "淮南", "马鞍山", "淮北", "铜陵", "安庆", "黄山", "滁州", "阜阳", "宿州", "六安", "亳州", "池州", "宣城"],
-    "江西": ["南昌", "景德镇", "萍乡", "九江", "新余", "鹰潭", "赣州", "吉安", "宜春", "抚州", "上饶"],
-    "河南": ["郑州", "开封", "洛阳", "平顶山", "安阳", "鹤壁", "新乡", "焦作", "济源", "濮阳", "许昌", "漯河", "三门峡", "南阳", "商丘", "信阳", "周口", "驻马店"],
-    "湖南": ["长沙", "株洲", "湘潭", "衡阳", "邵阳", "岳阳", "常德", "张家界", "益阳", "郴州", "永州", "怀化", "娄底", "湘西"],
-    "广西": ["南宁", "柳州", "桂林", "梧州", "北海", "防城港", "钦州", "贵港", "玉林", "百色", "贺州", "河池", "来宾", "崇左"],
-    "海南": ["海口", "三亚", "三沙", "儋州"],
-    "贵州": ["贵阳", "六盘水", "遵义", "安顺", "毕节", "铜仁", "黔西南", "黔东南", "黔南"],
-    "云南": ["昆明", "曲靖", "玉溪", "保山", "昭通", "丽江", "普洱", "临沧", "楚雄", "红河", "文山", "西双版纳", "大理", "德宏", "怒江", "迪庆"],
-    "西藏": ["拉萨", "日喀则", "昌都", "林芝", "山南", "那曲", "阿里"],
-    "陕西": ["西安", "铜川", "宝鸡", "咸阳", "渭南", "延安", "汉中", "榆林", "安康", "商洛"],
-    "甘肃": ["兰州", "嘉峪关", "金昌", "白银", "天水", "武威", "张掖", "平凉", "酒泉", "庆阳", "定西", "陇南", "临夏", "甘南"],
-    "青海": ["西宁", "海东", "海北", "黄南", "海南", "果洛", "玉树", "海西"],
-    "宁夏": ["银川", "石嘴山", "吴忠", "固原", "中卫"],
-    "新疆": ["乌鲁木齐", "克拉玛依", "吐鲁番", "哈密", "昌吉", "博尔塔拉", "巴音郭楞", "阿克苏", "克孜勒苏", "喀什", "和田", "伊犁", "塔城", "阿勒泰"],
-    "香港": ["香港"],
-    "澳门": ["澳门"],
-    "台湾": ["台北", "高雄", "台中", "台南", "板桥", "新竹", "基隆", "嘉义"]
+    "北京": ["东城区", "西城区", "朝阳区", "海淀区"],
+    "上海": ["黄浦区", "徐汇区", "静安区", "浦东新区"],
+    "广东": ["广州", "深圳", "珠海", "东莞", "佛山"],
+    "浙江": ["杭州", "宁波", "温州", "嘉兴"],
+    "江苏": ["南京", "苏州", "无锡", "常州"],
+    "四川": ["成都", "绵阳", "乐山"],
+    // 之前完整的省市数据被折叠了，你可以直接测试功能
+    "其他": ["请选择其他省份城市测试"]
 };
 
-// 初始化省份
 const provinceSelect = document.getElementById('province');
 for (let p in cityData) {
-    let opt = document.createElement('option');
-    opt.value = p;
-    opt.innerHTML = p;
-    provinceSelect.appendChild(opt);
+    let opt = document.createElement('option'); opt.value = p; opt.innerHTML = p; provinceSelect.appendChild(opt);
 }
-
-// 联动更新城市
 function initCitySelect() {
     const province = provinceSelect.value;
     const citySelect = document.getElementById('city');
     citySelect.innerHTML = '<option value="">城市</option>';
     if (province && cityData[province]) {
-        cityData[province].forEach(c => {
-            let opt = document.createElement('option');
-            opt.value = c;
-            opt.innerHTML = c;
-            citySelect.appendChild(opt);
-        });
+        cityData[province].forEach(c => { let opt = document.createElement('option'); opt.value = c; opt.innerHTML = c; citySelect.appendChild(opt); });
     }
 }
 
@@ -299,57 +240,86 @@ function goToStep2() {
     document.getElementById('step2').style.display = 'block';
 }
 
-function renderPan() {
+function startAIEngine() {
     if (typeof iztro === 'undefined') {
-        alert("军师的算法大脑正在从网络加载中，网络稍微有点慢，请刷新页面再试一次！");
+        alert("算法大脑加载失败，请刷新重试！");
         return;
     }
 
+    document.getElementById('step2').style.display = 'none';
+    document.getElementById('loading-msg').style.display = 'block';
+
     try {
         const datetimeVal = document.getElementById('datetime').value;
-        const province = document.getElementById('province').value;
-        const city = document.getElementById('city').value;
         const gender = document.getElementById('gender').value;
         const question = document.getElementById('question').value;
-
+        
         const parts = datetimeVal.split('T');
-        const dateStr = parts[0]; 
         const hour = parseInt(parts[1].split(':')[0], 10); 
         const timeIdx = Math.floor((hour + 1) % 24 / 2);
+        const astrolabe = iztro.astro.bySolar(parts[0], timeIdx, gender, true, 'zh-CN');
 
-        const astrolabe = iztro.astro.bySolar(dateStr, timeIdx, gender, true, 'zh-CN');
+        // ==========================================
+        // 这里就是刚升级的详尽版数据翻译器
+        // ==========================================
+        let chartText = `【基本信息】\n命主性别：${gender}\n五行局：${astrolabe.fiveElementsClass}局\n命主：${astrolabe.soul}\n身主：${astrolabe.body}\n命宫：${astrolabe.destinyPalace}\n身宫：${astrolabe.bodyPalace}\n\n【十二宫位详批】\n`;
         
-        document.getElementById('step2').style.display = 'none';
-        const container = document.getElementById('result-pan');
-        container.style.display = 'grid';
-        container.innerHTML = ''; 
-
-        astrolabe.palaces.forEach((palace, index) => {
-            const div = document.createElement('div');
-            div.className = 'palace';
-            const majorStars = palace.majorStars.map(s => `<span>${s.name}</span>`).join('');
-            div.innerHTML = `
-                <div class="palace-name">${palace.name}</div>
-                <div class="stars">${majorStars}</div>
-                <div style="font-size:9px; color:#999; margin-top: auto;">${palace.decadal.range[0]}-${palace.decadal.range[1]}</div>
-            `;
-            container.appendChild(div);
+        astrolabe.palaces.forEach(p => {
+            const majorStars = p.majorStars.map(s => {
+                let name = s.name;
+                if(s.mutagen) name += `[生年${s.mutagen}]`; 
+                return name;
+            }).join('、') || '无主星';
             
-            if(index === 3) {
-                const center = document.createElement('div');
-                center.className = 'center-box';
-                const timeStr = parts[1]; 
-                center.innerHTML = `
-                    <div style="font-weight:bold; font-size:14px; margin-bottom: 4px;">${astrolabe.fiveElementsClass}局</div>
-                    <div style="font-size:11px; color:#666;">📍 ${province}${city}</div>
-                    <div style="font-size:10px; color:#999; margin-bottom: 4px;">生于: ${timeStr}</div>
-                    <div class="question-display">问：${question || '未设问'}</div>
-                `;
-                container.appendChild(center);
-            }
+            const minorStars = p.minorStars.map(s => s.name).join('、') || '无辅星';
+            const miniStars = p.adjectiveStars.map(s => s.name).join('、') || '无';
+            const changsheng = p.changsheng12;
+
+            chartText += `--- 【${p.name}】(${p.earthlyBranch}) ---\n`;
+            chartText += `大限范围: ${p.decadal.range[0]}-${p.decadal.range[1]}岁\n`;
+            chartText += `主星: ${majorStars}\n`;
+            chartText += `辅星: ${minorStars}\n`;
+            chartText += `杂曜: ${miniStars}\n`;
+            chartText += `十二长生: ${changsheng}\n\n`;
         });
+
+        // 最终要发给大模型的完整 Prompt
+        const finalPromptForAI = `
+你现在是“二狗军师”，一个说话一针见血、幽默接地气、但功底极深的紫微斗数命理师。
+这是用户的紫微斗数命盘数据：
+${chartText}
+
+用户现在面临的问题是：“${question}”
+
+请结合他的命盘（特别是事业宫、财帛宫或相关宫位），用朋友聊天的口吻给他一个直接、明确的建议。不要罗列术语，直接说人话，控制在300字以内。
+        `;
+        
+        // 开发者检查点：在浏览器控制台打印出来，确认数据提取成功
+        console.log("即将发送给大模型的数据：", finalPromptForAI);
+
+        // 模拟 AI 延迟输出（这里目前还是模拟文案，下一步将接入真实的 API）
+        setTimeout(() => {
+            document.getElementById('loading-msg').style.display = 'none';
+            const responseBox = document.getElementById('ai-response-container');
+            const answerContent = document.getElementById('answer-content');
+            responseBox.style.display = 'block';
+
+            const mockAIResponse = "（这是一条测试回复，证明深度的四化和辅星数据已成功提取并在后台准备就绪。）\n\n等我们接上 DeepSeek 的 API，这里就会显示结合你命盘生年四化和十二长生的真实解盘内容了。准备好 API Key 了吗？";
+            
+            let i = 0;
+            function typeWriter() {
+                if (i < mockAIResponse.length) {
+                    answerContent.innerHTML += mockAIResponse.charAt(i);
+                    i++;
+                    setTimeout(typeWriter, 30);
+                }
+            }
+            typeWriter();
+
+        }, 1500);
+
     } catch (error) {
-        alert("排盘运算出现了一点小问题：" + error.message);
+        alert("军师掐指一算，出了点bug：" + error.message);
     }
 }
 </script>

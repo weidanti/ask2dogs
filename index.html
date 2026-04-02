@@ -15,7 +15,7 @@
 
         body { 
             font-family: "PingFang SC", "Helvetica Neue", sans-serif; 
-            background-color: #f4efe8; 
+            background-color: var(--bg); 
             color: var(--accent);
             margin: 0;
             padding: 20px;
@@ -84,6 +84,18 @@
             box-sizing: border-box;
         }
 
+        /* 将省市选择框并排的一行布局 */
+        .location-picker {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 24px;
+        }
+
+        .location-picker select {
+            margin-bottom: 0; /* 抵消默认的下边距 */
+            width: 50%;
+        }
+
         input[type="datetime-local"] {
             display: flex;
             align-items: center;
@@ -149,7 +161,7 @@
         .center-box {
             grid-column: 2 / 4;
             grid-row: 2 / 4;
-            background: #f4efe8;
+            background: var(--bg);
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -186,15 +198,15 @@
     <label>出生时间</label>
     <input type="datetime-local" id="datetime" value="1995-01-01T12:00">
 
-    <label>出生省份</label>
-    <select id="province" onchange="initCitySelect()">
-        <option value="">请选择省份</option>
-    </select>
-
     <label>出生城市</label>
-    <select id="city">
-        <option value="">请先选择省份</option>
-    </select>
+    <div class="location-picker">
+        <select id="province" onchange="initCitySelect()">
+            <option value="">省份</option>
+        </select>
+        <select id="city">
+            <option value="">城市</option>
+        </select>
+    </div>
 
     <label>性别</label>
     <select id="gender">
@@ -265,7 +277,7 @@ for (let p in cityData) {
 function initCitySelect() {
     const province = provinceSelect.value;
     const citySelect = document.getElementById('city');
-    citySelect.innerHTML = '<option value="">请选择城市</option>';
+    citySelect.innerHTML = '<option value="">城市</option>';
     if (province && cityData[province]) {
         cityData[province].forEach(c => {
             let opt = document.createElement('option');

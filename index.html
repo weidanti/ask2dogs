@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>问问二狗。</title>
+    <title>问问二狗</title>
     <script src="https://unpkg.com/iztro/dist/index.min.js"></script>
     <style>
         :root {
@@ -184,28 +184,28 @@
 
 <header>
     <h1>二狗军师</h1>
-    <p>不确定就问问二狗。</p>
+    <p>不确定就问问二狗</p>
 </header>
 
 <div id="step1" class="input-section">
-    <label>出生时间 (日期与具体到几点)</label>
+    <label>出生时间</label>
     <input type="datetime-local" id="datetime" value="1995-01-01T12:00">
 
     <label>出生城市</label>
-    <input type="text" id="city" placeholder="例如：杭州 或 浙江杭州">
+    <input type="text" id="city" placeholder="例如：浙江杭州">
 
-    <label>性别 (排盘必需)</label>
+    <label>性别</label>
     <select id="gender">
-        <option value="male">乾 (男)</option>
-        <option value="female">坤 (女)</option>
+        <option value="male">男</option>
+        <option value="female">女</option>
     </select>
 
-    <button onclick="goToStep2()">军师准备好了</button>
+    <button onclick="goToStep2()">准备开始</button>
 </div>
 
 <div id="step2" class="input-section" style="display:none;">
     <label>请详细描述你的问题</label>
-    <textarea id="question" placeholder="例如：今年事业运势如何？适合创业吗？"></textarea>
+    <textarea id="question" placeholder="我要放弃高薪工作去做包子吗"></textarea>
 
     <button onclick="renderPan()">请军师指点</button>
 </div>

@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>问问二狗</title>
-    <script src="https://cdn.jsdelivr.net/npm/iztro/dist/iztro.min.js"></script>
+    <script src="https://unpkg.zhimg.com/iztro/dist/iztro.min.js"></script>
     <style>
         :root { --bg: #f4efe8; --steel: #d2d2d7; --accent: #1d1d1f; --glass: rgba(255, 255, 255, 0.7); }
         body { font-family: "PingFang SC", "Helvetica Neue", sans-serif; background-color: var(--bg); color: var(--accent); margin: 0; padding: 20px; line-height: 1.6; -webkit-font-smoothing: antialiased; }
@@ -16,7 +16,7 @@
         input, select, textarea { width: 100%; background: transparent; border: none; border-bottom: 1px solid var(--steel); padding: 12px 0; margin-bottom: 24px; font-size: 16px; outline: none; color: var(--accent); border-radius: 0; }
         .location-picker { display: flex; gap: 15px; margin-bottom: 24px; }
         .location-picker select { width: 50%; margin-bottom: 0; }
-        textarea { height: 120px; resize: none; font-size: 18px; border: 1px solid var(--steel); padding: 10px; background: #fff; box-sizing: border-box; }
+        textarea { height: 120px; resize: none; font-size: 18px; border: 1px solid var(--steel); padding: 10px; background: #fff; box-sizing: border-box; display: block; }
         button { width: 100%; background: var(--accent); color: white; border: none; padding: 18px; font-size: 14px; letter-spacing: 2px; cursor: pointer; transition: all 0.3s; }
         button:active { opacity: 0.8; transform: scale(0.98); }
         #ai-response-container { display: none; background: #fff; padding: 35px 25px; border-top: 4px solid var(--accent); margin-top: 20px; }
@@ -89,16 +89,22 @@ function copyWechat() {
 let globalAstrolabe = null;
 
 function renderSOPReport() {
-    if (typeof iztro === 'undefined') return alert("算法库加载中，请稍候再试");
+    // 强制检查 iztro 是否加载
+    if (typeof iztro === 'undefined') {
+        alert("正在努力连接国内核心算法库，请再等3秒重试...");
+        return;
+    }
     const datetimeVal = document.getElementById('datetime').value;
     const province = provinceSelect.value;
     const city = document.getElementById('city').value;
-    if(!datetimeVal || !province || !city) return alert("请完整填写出生时间与地点");
+    if(!datetimeVal || !province || !city) return alert("请完整选择出生时间、省份和城市");
 
     try {
         const parts = datetimeVal.split('T');
         const timeIdx = Math.floor((parseInt(parts[1].split(':')[0], 10) + 1) % 24 / 2);
         const gender = document.getElementById('gender').value;
+        
+        // 核心排盘
         globalAstrolabe = iztro.astro.bySolar(parts[0], timeIdx, gender, true, 'zh-CN');
 
         const ming = globalAstrolabe.palaces.find(p => p.name === '命宫');
@@ -114,8 +120,10 @@ function renderSOPReport() {
         document.getElementById('quick-sop-report').innerHTML = reportHtml;
         document.getElementById('step1').style.display = 'none';
         document.getElementById('step2').style.display = 'block';
+        window.scrollTo(0,0);
     } catch (e) {
-        alert("排盘解析失败，请检查时间格式");
+        alert("解析排盘出错，请刷新页面重试");
+        console.error(e);
     }
 }
 
@@ -133,7 +141,7 @@ async function startAIEngine() {
             chartData += `- ${p.name}(${p.earthlyBranch}): [${ms||'空'}] + [${ns}]，大限[${p.decadal.range[0]}-${p.decadal.range[1]}]\n`;
         });
 
-        const systemPrompt = `你现在是“二狗军师”，顶级战略顾问。严格遵守：物理环境论、化忌本质论、煞星工具化。禁止废话和温情鼓励。输出结构：1.命局底色（1段） 2.傲人优势（1段） 3.黑洞风险（1段） 4.时间窗口（1段，含大运流年及针对问题的推演） 5.破局指令（1段）。控制在1000字内，书信体，专业犀利。末尾自然提到如需深度建模可私聊。`;
+        const systemPrompt = `你现在是“二狗军师”，顶级战略顾问。严格遵守：物理环境论、化忌本质论、煞星工具化。禁止废话和温情鼓励。输出结构：1.命局底色 2.傲人优势 3.黑洞风险 4.时间窗口 5.破局指令。字数1000字内，书信体，专业犀利。末尾自然提到如需深度建模可私聊。`;
         const API_KEY = "sk-e929f9505b6742afbf1826936dcec69a";
 
         const response = await fetch("https://api.deepseek.com/chat/completions", {

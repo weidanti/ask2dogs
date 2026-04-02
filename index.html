@@ -3,14 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>二狗军师</title>
+    <title>二狗军师 - 紫微斗数</title>
     <script src="https://unpkg.com/iztro/dist/index.min.js"></script>
     <style>
         :root {
-            --bg: #f8f8f8;
+            /* 意式极简配色：高级米杏底色，不锈钢边框，深邃黑文字 */
+            --bg: #f4efe8; 
             --steel: #d2d2d7;
             --accent: #1d1d1f;
-            --glass: rgba(255, 255, 255, 0.8);
+            --glass: rgba(255, 255, 255, 0.6);
         }
 
         body { 
@@ -24,70 +25,72 @@
 
         /* 顶部品牌区 */
         header {
-            text-align: center;
+            text-align: left; /* 强制大标题居左 */
             margin-bottom: 30px;
-            padding-top: 20px;
+            padding-top: 10px;
         }
 
         header h1 {
             font-size: 28px;
-            letter-spacing: 4px;
+            letter-spacing: 2px;
             font-weight: 300;
             margin: 0;
-            text-transform: uppercase;
         }
 
         header p {
             font-size: 12px;
             color: #888;
-            letter-spacing: 2px;
+            letter-spacing: 1px;
+            margin-top: 5px;
         }
 
         /* 输入卡片 */
         .input-section {
             background: var(--glass);
             backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px); /* 兼容苹果 */
             border: 1px solid var(--steel);
             padding: 24px;
             margin-bottom: 20px;
+            box-sizing: border-box;
         }
 
         label {
             display: block;
             font-size: 12px;
-            margin-bottom: 5px;
+            margin-bottom: 8px;
             color: #666;
             text-transform: uppercase;
         }
 
-       input, select, textarea {
+        /* 强制居左并统一表单样式 */
+        input, select, textarea {
             width: 100%;
             background: transparent;
             border: none;
             border-bottom: 1px solid var(--steel);
             padding: 10px 0;
-            margin-bottom: 20px;
+            margin-bottom: 24px;
             font-size: 16px;
             border-radius: 0;
             outline: none;
             color: var(--accent);
-            /* --- 以下是新增的强力靠左代码 --- */
             text-align: left;
             display: block;
-            appearance: none; /* 去除浏览器默认样式 */
-            -webkit-appearance: none; /* 兼容苹果手机 */
+            appearance: none;
+            -webkit-appearance: none;
+            box-sizing: border-box;
         }
 
-        /* 针对日期输入框的特殊处理 */
+        /* 针对日期输入框的特殊强制居左处理 */
         input[type="date"] {
-            text-align: left;
             display: flex;
             align-items: center;
             justify-content: flex-start;
         }
 
         textarea {
-            height: 80px;
+            height: 60px;
             resize: none;
         }
 
@@ -96,11 +99,12 @@
             background: var(--accent);
             color: white;
             border: none;
-            padding: 15px;
+            padding: 16px;
             font-size: 14px;
             letter-spacing: 2px;
             cursor: pointer;
             transition: opacity 0.3s;
+            margin-top: 10px;
         }
 
         button:active {
@@ -118,9 +122,9 @@
         }
 
         .palace {
-            background: white;
+            background: rgba(255, 255, 255, 0.9);
             aspect-ratio: 1 / 1.2;
-            padding: 8px;
+            padding: 6px;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
@@ -129,7 +133,7 @@
         .palace-name {
             font-size: 12px;
             font-weight: bold;
-            color: #a00; /* 宫位名稍微点缀红色 */
+            color: #8b0000; /* 宫位名深红色点缀 */
         }
 
         .stars {
@@ -142,7 +146,7 @@
         .center-box {
             grid-column: 2 / 4;
             grid-row: 2 / 4;
-            background: #eee;
+            background: var(--bg);
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -150,14 +154,21 @@
             font-size: 12px;
             text-align: center;
             padding: 10px;
+            box-sizing: border-box;
         }
 
         .question-display {
             font-style: italic;
             color: #555;
-            margin-top: 5px;
-            border-top: 1px solid #ccc;
-            padding-top: 5px;
+            margin-top: 8px;
+            border-top: 1px solid var(--steel);
+            padding-top: 8px;
+            width: 100%;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
         }
     </style>
 </head>
@@ -165,11 +176,11 @@
 
 <header>
     <h1>二狗军师</h1>
-    <p>不确定就问问二狗</p>
+    <p>人生推演</p>
 </header>
 
 <div class="input-section">
-    <label>生日</label>
+    <label>你的生辰八字</label>
     <input type="date" id="date" value="1995-01-01">
     
     <label>出生时辰</label>
@@ -188,14 +199,17 @@
         <option value="11">亥时 (21:00-23:00)</option>
     </select>
 
+    <label>出生城市</label>
+    <input type="text" id="city" placeholder="例如：杭州 或 浙江杭州">
+
     <label>性别</label>
     <select id="gender">
         <option value="male">乾 (男)</option>
         <option value="female">坤 (女)</option>
     </select>
 
-    <label>你想问二狗军师：</label>
-    <textarea id="question" placeholder="问题越具体越好"></textarea>
+    <label>你想问军师的问题</label>
+    <textarea id="question" placeholder="例如：今年事业运势如何？适合创业吗？"></textarea>
 
     <button onclick="renderPan()">请军师指点</button>
 </div>
@@ -207,8 +221,14 @@
 function renderPan() {
     const dateStr = document.getElementById('date').value;
     const timeIdx = document.getElementById('time').value;
+    const city = document.getElementById('city').value;
     const gender = document.getElementById('gender').value;
     const question = document.getElementById('question').value;
+
+    if (!dateStr) {
+        alert("请选择生辰八字！");
+        return;
+    }
 
     // 1. 调用算法
     const astrolabe = iztro.astro.astrolabeBySolarDate(dateStr, parseInt(timeIdx), gender);
@@ -229,7 +249,7 @@ function renderPan() {
         div.innerHTML = `
             <div class="palace-name">${palace.name}</div>
             <div class="stars">${majorStars}</div>
-            <div style="font-size:9px; color:#999">${palace.decadal.range[0]}-${palace.decadal.range[1]}</div>
+            <div style="font-size:9px; color:#999; margin-top: auto;">${palace.decadal.range[0]}-${palace.decadal.range[1]}</div>
         `;
         container.appendChild(div);
         
@@ -238,7 +258,8 @@ function renderPan() {
             const center = document.createElement('div');
             center.className = 'center-box';
             center.innerHTML = `
-                <div style="font-weight:bold; font-size:14px;">${astrolabe.fiveElementsClass}局</div>
+                <div style="font-weight:bold; font-size:14px; margin-bottom: 4px;">${astrolabe.fiveElementsClass}局</div>
+                <div style="font-size:11px; color:#666;">📍 ${city || '未提供城市'}</div>
                 <div class="question-display">问：${question || '未设问'}</div>
             `;
             container.appendChild(center);
@@ -246,7 +267,7 @@ function renderPan() {
     });
     
     // 自动滚动到底部看结果
-    container.scrollIntoView({ behavior: 'smooth' });
+    container.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 </script>
 

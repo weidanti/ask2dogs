@@ -2,44 +2,240 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>我的紫微斗数排盘</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>二狗军师 - 紫微斗数</title>
+    <script src="https://unpkg.com/iztro/dist/index.min.js"></script>
     <style>
-        body { font-family: sans-serif; background: #f4f4f9; display: flex; flex-direction: column; align-items: center; padding: 20px; }
-        .card { background: white; padding: 20px; border-radius: 15px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); width: 100%; max-width: 400px; }
-        h1 { color: #333; font-size: 1.5rem; text-align: center; }
-        input, select, button { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; }
-        button { background: #6200ee; color: white; border: none; font-weight: bold; cursor: pointer; }
-        #result { margin-top: 20px; padding: 15px; background: #e8eaf6; border-radius: 8px; display: none; }
+        :root {
+            --bg: #f8f8f8;
+            --steel: #d2d2d7;
+            --accent: #1d1d1f;
+            --glass: rgba(255, 255, 255, 0.8);
+        }
+
+        body { 
+            font-family: "PingFang SC", "Helvetica Neue", sans-serif; 
+            background-color: var(--bg); 
+            color: var(--accent);
+            margin: 0;
+            padding: 20px;
+            line-height: 1.6;
+        }
+
+        /* 顶部品牌区 */
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding-top: 20px;
+        }
+
+        header h1 {
+            font-size: 28px;
+            letter-spacing: 4px;
+            font-weight: 300;
+            margin: 0;
+            text-transform: uppercase;
+        }
+
+        header p {
+            font-size: 12px;
+            color: #888;
+            letter-spacing: 2px;
+        }
+
+        /* 输入卡片 */
+        .input-section {
+            background: var(--glass);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--steel);
+            padding: 24px;
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            font-size: 12px;
+            margin-bottom: 5px;
+            color: #666;
+            text-transform: uppercase;
+        }
+
+        input, select, textarea {
+            width: 100%;
+            background: transparent;
+            border: none;
+            border-bottom: 1px solid var(--steel);
+            padding: 10px 0;
+            margin-bottom: 20px;
+            font-size: 16px;
+            border-radius: 0;
+            outline: none;
+            color: var(--accent);
+        }
+
+        textarea {
+            height: 80px;
+            resize: none;
+        }
+
+        button {
+            width: 100%;
+            background: var(--accent);
+            color: white;
+            border: none;
+            padding: 15px;
+            font-size: 14px;
+            letter-spacing: 2px;
+            cursor: pointer;
+            transition: opacity 0.3s;
+        }
+
+        button:active {
+            opacity: 0.7;
+        }
+
+        /* 12宫格设计 */
+        #result-pan {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1px;
+            background-color: var(--steel);
+            border: 1px solid var(--steel);
+            margin-top: 30px;
+        }
+
+        .palace {
+            background: white;
+            aspect-ratio: 1 / 1.2;
+            padding: 8px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .palace-name {
+            font-size: 12px;
+            font-weight: bold;
+            color: #a00; /* 宫位名稍微点缀红色 */
+        }
+
+        .stars {
+            font-size: 11px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 2px;
+        }
+
+        .center-box {
+            grid-column: 2 / 4;
+            grid-row: 2 / 4;
+            background: #eee;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            text-align: center;
+            padding: 10px;
+        }
+
+        .question-display {
+            font-style: italic;
+            color: #555;
+            margin-top: 5px;
+            border-top: 1px solid #ccc;
+            padding-top: 5px;
+        }
     </style>
 </head>
 <body>
 
-    <div class="card">
-        <h1>紫微斗数排盘</h1>
-        <p>输入你的生辰八字：</p>
-        <input type="date" id="birthday">
-        <select id="gender">
-            <option value="male">男</option>
-            <option value="female">女</option>
-        </select>
-        <button onclick="startCalculate()">开始排盘</button>
-        
-        <div id="result">
-            <strong>排盘结果：</strong>
-            <p id="output">正在连接算法库...</p>
-        </div>
+<header>
+    <h1>二狗军师</h1>
+    <p>DIGITAL STRATEGIST</p>
+</header>
+
+<div class="input-section">
+    <label>你的生辰八字</label>
+    <input type="date" id="date" value="1995-01-01">
+    
+    <label>出生时辰</label>
+    <select id="time">
+        <option value="0">子时 (00:00-01:00)</option>
+        <option value="1">丑时 (01:00-03:00)</option>
+        <option value="2">寅时 (03:00-05:00)</option>
+        <option value="3">卯时 (05:00-07:00)</option>
+        <option value="4">辰时 (07:00-09:00)</option>
+        <option value="5">巳时 (09:00-11:00)</option>
+        <option value="6">午时 (11:00-13:00)</option>
+        <option value="7">未时 (13:00-15:00)</option>
+        <option value="8">申时 (15:00-17:00)</option>
+        <option value="9">酉时 (17:00-19:00)</option>
+        <option value="10">戌时 (19:00-21:00)</option>
+        <option value="11">亥时 (21:00-23:00)</option>
+    </select>
+
+    <label>性别</label>
+    <select id="gender">
+        <option value="male">乾 (男)</option>
+        <option value="female">坤 (女)</option>
+    </select>
+
+    <label>你想问军师的问题</label>
+    <textarea id="question" placeholder="例如：今年事业运势如何？适合创业吗？"></textarea>
+
+    <button onclick="renderPan()">请军师指点</button>
+</div>
+
+<div id="result-pan" style="display:none;">
     </div>
 
-    <script>
-        function startCalculate() {
-            const birth = document.getElementById('birthday').value;
-            if(!birth) { alert('请先选择日期'); return; }
-            
-            document.getElementById('result').style.display = 'block';
-            document.getElementById('output').innerHTML = "你选择的生日是：" + birth + "<br>系统正在集成 iztro 算法库中...";
-            // 未来这里会接入真正的紫微斗数运算代码
+<script>
+function renderPan() {
+    const dateStr = document.getElementById('date').value;
+    const timeIdx = document.getElementById('time').value;
+    const gender = document.getElementById('gender').value;
+    const question = document.getElementById('question').value;
+
+    // 1. 调用算法
+    const astrolabe = iztro.astro.astrolabeBySolarDate(dateStr, parseInt(timeIdx), gender);
+    
+    // 2. 显示容器
+    const container = document.getElementById('result-pan');
+    container.style.display = 'grid';
+    container.innerHTML = ''; 
+
+    // 3. 渲染 12 宫
+    astrolabe.palaces.forEach((palace, index) => {
+        const div = document.createElement('div');
+        div.className = 'palace';
+        
+        // 星曜处理
+        const majorStars = palace.majorStars.map(s => `<span>${s.name}</span>`).join('');
+        
+        div.innerHTML = `
+            <div class="palace-name">${palace.name}</div>
+            <div class="stars">${majorStars}</div>
+            <div style="font-size:9px; color:#999">${palace.decadal.range[0]}-${palace.decadal.range[1]}</div>
+        `;
+        container.appendChild(div);
+        
+        // 中间显示区
+        if(index === 3) {
+            const center = document.createElement('div');
+            center.className = 'center-box';
+            center.innerHTML = `
+                <div style="font-weight:bold; font-size:14px;">${astrolabe.fiveElementsClass}局</div>
+                <div class="question-display">问：${question || '未设问'}</div>
+            `;
+            container.appendChild(center);
         }
-    </script>
+    });
+    
+    // 自动滚动到底部看结果
+    container.scrollIntoView({ behavior: 'smooth' });
+}
+</script>
+
 </body>
 </html>

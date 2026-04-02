@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>二狗军师 - 不确定就问问二狗。</title>
+    <title>问问二狗</title>
     <script src="https://unpkg.com/iztro/dist/index.min.js"></script>
     <style>
         :root {
@@ -182,7 +182,7 @@
 
 <header>
     <h1>二狗军师</h1>
-    <p>不确定就问问二狗。</p>
+    <p>不确定就问问二狗</p>
 </header>
 
 <div id="step1" class="input-section">
@@ -192,4 +192,100 @@
     <label>出生时辰</label>
     <select id="time">
         <option value="0">子时 (00:00-01:00)</option>
-        <option value="1">丑时 (01:00-03:00
+        <option value="1">丑时 (01:00-03:00)</option>
+        <option value="2">寅时 (03:00-05:00)</option>
+        <option value="3">卯时 (05:00-07:00)</option>
+        <option value="4">辰时 (07:00-09:00)</option>
+        <option value="5">巳时 (09:00-11:00)</option>
+        <option value="6">午时 (11:00-13:00)</option>
+        <option value="7">未时 (13:00-15:00)</option>
+        <option value="8">申时 (15:00-17:00)</option>
+        <option value="9">酉时 (17:00-19:00)</option>
+        <option value="10">戌时 (19:00-21:00)</option>
+        <option value="11">亥时 (21:00-23:00)</option>
+    </select>
+
+    <label>出生城市</label>
+    <input type="text" id="city" placeholder="例如：浙江杭州">
+
+    <label>性别</label>
+    <select id="gender">
+        <option value="male">男</option>
+        <option value="female">女</option>
+    </select>
+
+    <button onclick="goToStep2()">准备好了</button>
+</div>
+
+<div id="step2" class="input-section" style="display:none;">
+    <label>请详细描述你的问题</label>
+    <textarea id="question" placeholder="例如：我适合放弃高薪去卖包子吗"></textarea>
+
+    <button onclick="renderPan()">请军师指点</button>
+</div>
+
+<div id="result-pan" style="display:none;">
+    </div>
+
+<script>
+// 从第一页进入第二页的逻辑
+function goToStep2() {
+    const dateStr = document.getElementById('date').value;
+    if (!dateStr) {
+        alert("请先选择出生日期！");
+        return;
+    }
+    // 隐藏第一页，显示第二页
+    document.getElementById('step1').style.display = 'none';
+    document.getElementById('step2').style.display = 'block';
+}
+
+// 第二页点击排盘的逻辑
+function renderPan() {
+    const dateStr = document.getElementById('date').value;
+    const timeIdx = document.getElementById('time').value;
+    const city = document.getElementById('city').value;
+    const gender = document.getElementById('gender').value;
+    const question = document.getElementById('question').value;
+
+    // 1. 隐藏输入框，准备显示排盘
+    document.getElementById('step2').style.display = 'none';
+
+    // 2. 调用算法
+    const astrolabe = iztro.astro.astrolabeBySolarDate(dateStr, parseInt(timeIdx), gender);
+    
+    // 3. 显示容器
+    const container = document.getElementById('result-pan');
+    container.style.display = 'grid';
+    container.innerHTML = ''; 
+
+    // 4. 渲染 12 宫
+    astrolabe.palaces.forEach((palace, index) => {
+        const div = document.createElement('div');
+        div.className = 'palace';
+        
+        const majorStars = palace.majorStars.map(s => `<span>${s.name}</span>`).join('');
+        
+        div.innerHTML = `
+            <div class="palace-name">${palace.name}</div>
+            <div class="stars">${majorStars}</div>
+            <div style="font-size:9px; color:#999; margin-top: auto;">${palace.decadal.range[0]}-${palace.decadal.range[1]}</div>
+        `;
+        container.appendChild(div);
+        
+        if(index === 3) {
+            const center = document.createElement('div');
+            center.className = 'center-box';
+            center.innerHTML = `
+                <div style="font-weight:bold; font-size:14px; margin-bottom: 4px;">${astrolabe.fiveElementsClass}局</div>
+                <div style="font-size:11px; color:#666;">📍 ${city || '未提供城市'}</div>
+                <div class="question-display">问：${question || '未设问'}</div>
+            `;
+            container.appendChild(center);
+        }
+    });
+}
+</script>
+
+</body>
+</html>

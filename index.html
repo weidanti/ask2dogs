@@ -60,18 +60,30 @@
             text-transform: uppercase;
         }
 
-        input, select, textarea {
-    width: 100%;
-    background: transparent;
-    border: none;
-    border-bottom: 1px solid var(--steel);
-    padding: 10px 0;
-    margin-bottom: 20px;
-    font-size: 16px;
-    border-radius: 0;
-    outline: none;
-    color: var(--accent);
-    text-align: left; /* 强制居左 */
+       input, select, textarea {
+            width: 100%;
+            background: transparent;
+            border: none;
+            border-bottom: 1px solid var(--steel);
+            padding: 10px 0;
+            margin-bottom: 20px;
+            font-size: 16px;
+            border-radius: 0;
+            outline: none;
+            color: var(--accent);
+            /* --- 以下是新增的强力靠左代码 --- */
+            text-align: left;
+            display: block;
+            appearance: none; /* 去除浏览器默认样式 */
+            -webkit-appearance: none; /* 兼容苹果手机 */
+        }
+
+        /* 针对日期输入框的特殊处理 */
+        input[type="date"] {
+            text-align: left;
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
         }
 
         textarea {

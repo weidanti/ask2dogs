@@ -3,30 +3,43 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>问问二狗</title>
-    <script src="https://cdn.bootcdn.net/ajax/libs/iztro/1.4.1/iztro.min.js"></script>
+    <title>二狗军师</title>
     <style>
-        :root { --bg: #f4efe8; --steel: #d2d2d7; --accent: #1d1d1f; --glass: rgba(255, 255, 255, 0.7); }
-        body { font-family: "PingFang SC", "Helvetica Neue", sans-serif; background-color: var(--bg); color: var(--accent); margin: 0; padding: 20px; line-height: 1.6; -webkit-font-smoothing: antialiased; }
+        :root { --bg: #f4efe8; --steel: #d2d2d7; --accent: #1d1d1f; --glass: rgba(255,255,255,0.7); --red: #8b0000; }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: "PingFang SC","Helvetica Neue","Noto Sans SC",sans-serif; background: var(--bg); color: var(--accent); padding: 20px; line-height: 1.6; -webkit-font-smoothing: antialiased; max-width: 520px; margin: 0 auto; min-height: 100vh; }
         header { text-align: center; margin-bottom: 30px; padding-top: 10px; }
-        header h1 { font-size: 36px; letter-spacing: 4px; font-weight: 300; margin: 0; }
+        header h1 { font-size: 36px; letter-spacing: 4px; font-weight: 300; }
         header p { font-size: 14px; color: #888; margin-top: 8px; letter-spacing: 2px; }
-        .input-section { background: var(--glass); backdrop-filter: blur(10px); border: 1px solid var(--steel); padding: 24px; margin-bottom: 20px; box-shadow: 0 4px 20px rgba(0,0,0,0.02); }
-        label { display: block; font-size: 11px; margin-bottom: 8px; color: #888; text-transform: uppercase; letter-spacing: 1px; }
-        input, select, textarea { width: 100%; background: transparent; border: none; border-bottom: 1px solid var(--steel); padding: 12px 0; margin-bottom: 24px; font-size: 16px; outline: none; color: var(--accent); border-radius: 0; -webkit-appearance: none; }
-        .location-picker { display: flex; gap: 15px; margin-bottom: 24px; }
-        .location-picker select { width: 50%; margin-bottom: 0; }
-        textarea { height: 120px; resize: none; font-size: 18px; border: 1px solid var(--steel); padding: 10px; background: #fff; box-sizing: border-box; }
-        button { width: 100%; background: var(--accent); color: white; border: none; padding: 18px; font-size: 14px; letter-spacing: 2px; cursor: pointer; transition: all 0.3s; }
-        button:active { opacity: 0.8; transform: scale(0.98); }
-        #ai-response-container { display: none; background: #fff; padding: 35px 25px; border-top: 4px solid var(--accent); margin-top: 20px; }
-        .greeting { font-weight: bold; font-size: 16px; margin-bottom: 20px; color: #8b0000; letter-spacing: 1px; }
-        .answer-content { font-size: 15px; line-height: 2; color: #333; white-space: pre-wrap; text-align: justify; }
-        #private-referral { display: none; margin-top: 40px; padding: 30px 20px; border: 1px dashed var(--steel); background: #fafafa; text-align: center; }
-        .wechat-box { display: inline-flex; align-items: center; gap: 10px; background: #fff; padding: 10px 20px; border: 1px solid #eee; cursor: pointer; margin-top: 10px; }
-        .copy-btn { font-size: 11px; background: var(--accent); color: #fff; padding: 4px 8px; border-radius: 2px; }
-        .loading { font-size: 13px; color: #999; text-align: center; padding: 40px; display: none; }
-        .sop-report { font-size: 14px; color: #444; border-bottom: 1px solid #eee; padding-bottom: 20px; margin-bottom: 20px; line-height: 1.8; }
+        .card { background: var(--glass); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border: 1px solid var(--steel); padding: 24px; margin-bottom: 20px; box-shadow: 0 4px 20px rgba(0,0,0,0.02); }
+        label.lbl { display: block; font-size: 11px; margin-bottom: 8px; color: #888; text-transform: uppercase; letter-spacing: 1px; }
+        input, select { width: 100%; background: transparent; border: none; border-bottom: 1px solid var(--steel); padding: 12px 0; margin-bottom: 24px; font-size: 16px; outline: none; color: var(--accent); border-radius: 0; -webkit-appearance: none; }
+        .loc { display: flex; gap: 15px; margin-bottom: 24px; }
+        .loc select { width: 50%; margin-bottom: 0; }
+        textarea { width: 100%; height: 120px; resize: none; font-size: 18px; border: 1px solid var(--steel); padding: 10px; background: #fff; box-sizing: border-box; outline: none; color: var(--accent); font-family: inherit; line-height: 1.6; border-radius: 0; }
+        textarea::placeholder { color: #bbb; }
+        .btn { width: 100%; background: var(--accent); color: #fff; border: none; padding: 18px; font-size: 14px; letter-spacing: 2px; cursor: pointer; transition: all .3s; }
+        .btn:active { opacity: 0.8; transform: scale(0.98); }
+        .response { background: #fff; padding: 35px 25px; border-top: 4px solid var(--accent); margin-top: 20px; }
+        .greeting { font-weight: bold; font-size: 16px; margin-bottom: 20px; color: var(--red); letter-spacing: 1px; }
+        .answer { font-size: 15px; line-height: 2; color: #333; white-space: pre-wrap; text-align: justify; }
+        .referral { margin-top: 40px; padding: 30px 20px; border: 1px dashed var(--steel); background: #fafafa; text-align: center; }
+        .wx-box { display: inline-flex; align-items: center; gap: 10px; background: #fff; padding: 10px 20px; border: 1px solid #eee; cursor: pointer; margin-top: 10px; }
+        .copy-btn { font-size: 11px; background: var(--accent); color: #fff; padding: 4px 8px; border-radius: 2px; border: none; cursor: pointer; }
+        .loading { font-size: 13px; color: #999; text-align: center; padding: 60px 20px; }
+        .back { text-align: center; margin-top: 16px; padding-bottom: 10px; }
+        .back span { font-size: 12px; color: #999; cursor: pointer; letter-spacing: 1px; }
+        .back span:hover { color: #666; }
+        .sop { font-size: 14px; color: #444; border-bottom: 1px solid #eee; padding-bottom: 20px; margin-bottom: 20px; line-height: 1.8; }
+        .hidden { display: none; }
+        .status-msg { font-size: 11px; text-align: center; margin-top: 12px; }
+        .bottom-links { display: flex; justify-content: center; gap: 24px; margin-top: 20px; padding-bottom: 30px; }
+        @keyframes fadeUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes pulse { 0%,100% { opacity: .3; } 50% { opacity: 1; } }
+        @keyframes blink { 0%,100% { opacity: .15; } 50% { opacity: .9; } }
+        .fade-in { animation: fadeUp .5s ease-out; }
+        .pulse { animation: pulse 1.5s ease-in-out infinite; }
+        .cursor { animation: blink .8s infinite; color: var(--red); }
     </style>
 </head>
 <body>
@@ -36,146 +49,361 @@
     <p>不确定就问问二狗</p>
 </header>
 
-<div id="step1" class="input-section">
-    <label>出生时间</label>
+<!-- ══════════ PAGE 1: Birth Input ══════════ -->
+<div id="page-input" class="card fade-in">
+    <label class="lbl">出生时间</label>
     <input type="datetime-local" id="datetime" value="1995-01-01T12:00">
-    <label>出生地点</label>
-    <div class="location-picker">
-        <select id="province" onchange="initCitySelect()"><option value="">省份</option></select>
+
+    <label class="lbl">出生地点</label>
+    <div class="loc">
+        <select id="province" onchange="updateCities()"><option value="">省份</option></select>
         <select id="city"><option value="">城市</option></select>
     </div>
-    <label>性别</label>
+
+    <label class="lbl">性别</label>
     <select id="gender"><option value="男">男</option><option value="女">女</option></select>
-    <button onclick="renderSOPReport()">先简单看看</button>
+
+    <button class="btn" onclick="handleStep1()">先简单看看</button>
+    <div id="iztro-status" class="status-msg" style="color:#aaa;">算法引擎加载中...</div>
 </div>
 
-<div id="step2" class="input-section" style="display:none;">
-    <div id="quick-sop-report" class="sop-report"></div>
-    <label>详细描述你的问题</label>
-    <textarea id="question" placeholder="建议输入具体事件、时间点或核心困惑..."></textarea>
-    <button onclick="startAIEngine()">请军师指点</button>
+<!-- ══════════ PAGE 2: Analysis + Question ══════════ -->
+<div id="page-analysis" class="hidden">
+    <div id="analysis-loading" class="loading hidden">
+        <div class="pulse">正在扫描命盘物理场...</div>
+        <div style="font-size:11px;color:#bbb;margin-top:8px;">请稍候，军师正在推演中</div>
+    </div>
+    <div id="analysis-content" class="hidden fade-in">
+        <div class="card" style="padding:30px 24px;">
+            <div class="greeting">二狗军师 · 命盘扫描</div>
+            <div id="analysis-text" class="answer"></div>
+        </div>
+        <div id="question-section" class="card hidden fade-in">
+            <div style="font-size:16px;font-weight:500;margin-bottom:14px;border-bottom:1px solid #eee;padding-bottom:14px;">
+                现在可以问你的困惑了
+            </div>
+            <label class="lbl">详细描述你的问题</label>
+            <textarea id="question" placeholder="越详细越好……比如具体事件、时间点或核心困惑"></textarea>
+            <div style="margin-top:20px;">
+                <button class="btn" onclick="handleAsk()">请军师指点</button>
+            </div>
+        </div>
+        <div id="analysis-back" class="back hidden"><span onclick="reset()">← 重新输入</span></div>
+    </div>
 </div>
 
-<div id="loading-msg" class="loading">正在起卦扫描，调取流年磁场与物理黑洞...</div>
-
-<div id="ai-response-container">
-    <div class="greeting">二狗军师曰：</div>
-    <div id="answer-content" class="answer-content"></div>
-    <div id="private-referral">
-        <div style="font-size: 12px; color: #999; margin-bottom: 15px;">进一步全盘物理建模或流月避险</div>
-        <p style="font-size: 15px; margin-bottom: 5px; font-weight: bold;">添加二狗军师微信</p>
-        <div class="wechat-box" onclick="copyWechat()">
-            <span style="font-family: monospace; font-weight: bold; font-size: 18px;" id="wechatId">debut24</span>
-            <span class="copy-btn" id="copyText">复制</span>
+<!-- ══════════ PAGE 3: Answer ══════════ -->
+<div id="page-answer" class="hidden">
+    <div id="answer-loading" class="loading hidden">
+        <div class="pulse">正在起卦扫描，调取流年磁场...</div>
+        <div style="font-size:11px;color:#bbb;margin-top:8px;">请稍候，军师正在推演中</div>
+    </div>
+    <div id="answer-content" class="hidden fade-in">
+        <div class="response">
+            <div class="greeting">二狗军师曰：</div>
+            <div id="answer-text" class="answer"></div>
+        </div>
+        <div id="referral-section" class="referral hidden fade-in">
+            <div style="font-size:12px;color:#999;margin-bottom:15px;">如需一对一详细报告 · 全盘深度建模 · 流月避险指南</div>
+            <p style="font-size:15px;margin-bottom:5px;font-weight:bold;">添加二狗军师微信</p>
+            <div class="wx-box" onclick="copyWx()">
+                <span style="font-family:monospace;font-weight:bold;font-size:18px;">debut24</span>
+                <button class="copy-btn" id="copy-btn">复制</button>
+            </div>
+        </div>
+        <div id="answer-links" class="bottom-links hidden">
+            <div class="back"><span onclick="backToQuestion()">← 换个问题</span></div>
+            <div class="back"><span onclick="reset()">← 重新开始</span></div>
         </div>
     </div>
 </div>
 
 <script>
-// 使用国内最稳的省市数据
-const cityData = {"北京":["东城区","西城区","朝阳区","海淀区","丰台区","石景山区"],"上海":["黄浦区","徐汇区","长宁区","静安区","普陀区","虹口区"],"广东":["广州","深圳","珠海","汕头","佛山","江门","湛江"],"浙江":["杭州","宁波","温州","嘉兴","湖州","绍兴"],"江苏":["南京","无锡","徐州","常州","苏州","南通"],"四川":["成都","自贡","德阳","绵阳","广元"],"湖北":["武汉","黄石","十堰","宜昌"],"福建":["福州","厦门","莆田"]};
+/* ═══════════════════════════════════════════
+   DATA
+   ═══════════════════════════════════════════ */
+const cityData = {"北京":["东城区","西城区","朝阳区","海淀区","丰台区","石景山区","通州区","顺义区","昌平区","大兴区"],"上海":["黄浦区","徐汇区","长宁区","静安区","普陀区","虹口区","杨浦区","浦东新区","闵行区","宝山区"],"广东":["广州","深圳","珠海","汕头","佛山","江门","湛江","东莞","中山","惠州"],"浙江":["杭州","宁波","温州","嘉兴","湖州","绍兴","金华","台州"],"江苏":["南京","无锡","徐州","常州","苏州","南通","扬州","镇江"],"四川":["成都","自贡","德阳","绵阳","广元","乐山","宜宾"],"湖北":["武汉","黄石","十堰","宜昌","襄阳","荆州"],"湖南":["长沙","株洲","湘潭","衡阳","邵阳","岳阳"],"福建":["福州","厦门","莆田","泉州","漳州"],"山东":["济南","青岛","淄博","枣庄","烟台","潍坊","威海"],"河南":["郑州","开封","洛阳","南阳","信阳","许昌"],"河北":["石家庄","唐山","秦皇岛","保定","邯郸"],"辽宁":["沈阳","大连","鞍山","抚顺","本溪"],"吉林":["长春","吉林","四平","松原"],"黑龙江":["哈尔滨","齐齐哈尔","大庆","牡丹江"],"安徽":["合肥","芜湖","蚌埠","马鞍山","安庆"],"江西":["南昌","景德镇","萍乡","九江"],"陕西":["西安","铜川","宝鸡","咸阳","渭南"],"山西":["太原","大同","阳泉","长治"],"重庆":["渝中区","江北区","南岸区","沙坪坝区","九龙坡区"],"天津":["和平区","河东区","河西区","南开区","河北区"],"云南":["昆明","曲靖","玉溪","大理","丽江"],"贵州":["贵阳","六盘水","遵义"],"广西":["南宁","柳州","桂林","北海"],"海南":["海口","三亚"],"甘肃":["兰州","嘉峪关","天水"],"内蒙古":["呼和浩特","包头","赤峰"],"新疆":["乌鲁木齐","克拉玛依","吐鲁番"],"西藏":["拉萨","日喀则"],"青海":["西宁","海东"],"宁夏":["银川","石嘴山"],"香港":["香港"],"澳门":["澳门"],"台湾":["台北","高雄","台中","台南"]};
 
-const provinceSelect = document.getElementById('province');
-for(let p in cityData){ let opt=document.createElement('option'); opt.value=p; opt.innerHTML=p; provinceSelect.appendChild(opt); }
-function initCitySelect(){ const p=provinceSelect.value; const c=document.getElementById('city'); c.innerHTML='<option value="">城市</option>'; if(p && cityData[p]){ cityData[p].forEach(s=>{ let o=document.createElement('option'); o.value=s; o.innerHTML=s; c.appendChild(o); }); } }
+// Init province select
+const provSel = document.getElementById('province');
+for (let p in cityData) { let o = document.createElement('option'); o.value = p; o.textContent = p; provSel.appendChild(o); }
 
-function copyWechat() {
-    const id = document.getElementById('wechatId').innerText;
-    navigator.clipboard.writeText(id).then(() => {
-        document.getElementById('copyText').innerText = "已复制";
-        setTimeout(() => { document.getElementById('copyText').innerText = "复制"; }, 2000);
-    });
+function updateCities() {
+    const p = provSel.value;
+    const c = document.getElementById('city');
+    c.innerHTML = '<option value="">城市</option>';
+    if (p && cityData[p]) cityData[p].forEach(s => { let o = document.createElement('option'); o.value = s; o.textContent = s; c.appendChild(o); });
 }
 
-let globalAstrolabe = null;
+/* ═══════════════════════════════════════════
+   iztro Multi-CDN Loader
+   ═══════════════════════════════════════════ */
+const IZTRO_CDNS = [
+    'https://cdn.bootcdn.net/ajax/libs/iztro/1.4.1/iztro.min.js',
+    'https://cdn.staticfile.net/iztro/1.4.1/iztro.min.js',
+    'https://cdn.jsdelivr.net/npm/iztro@1.4.1/dist/iztro.min.js',
+    'https://unpkg.com/iztro@1.4.1/dist/iztro.min.js',
+];
+let iztroReady = false;
 
-function renderSOPReport() {
-    // 检查 iztro 是否加载（增加了兼容性检测）
-    const engine = window.iztro || (window.iztro && window.iztro.astro);
-    if (!engine) {
-        alert("算法库加载受阻。请尝试：\n1. 刷新页面\n2. 检查网络连接\n3. 关闭梯子/翻墙软件");
+(function loadIztro(idx) {
+    if (idx >= IZTRO_CDNS.length) {
+        document.getElementById('iztro-status').textContent = '算法引擎加载失败，请刷新页面重试';
+        document.getElementById('iztro-status').style.color = '#c00';
         return;
     }
-    
-    const datetimeVal = document.getElementById('datetime').value;
-    const province = provinceSelect.value;
-    const city = document.getElementById('city').value;
-    if(!datetimeVal || !province || !city) return alert("请完整选择时间与地点");
+    const s = document.createElement('script');
+    s.src = IZTRO_CDNS[idx];
+    s.onload = function() {
+        if (window.iztro) {
+            iztroReady = true;
+            document.getElementById('iztro-status').style.display = 'none';
+        } else {
+            loadIztro(idx + 1);
+        }
+    };
+    s.onerror = function() { loadIztro(idx + 1); };
+    document.head.appendChild(s);
+})(0);
+
+/* ═══════════════════════════════════════════
+   PROMPTS
+   ═══════════════════════════════════════════ */
+const ANALYSIS_PROMPT = `你现在是"二狗军师"，一位顶级紫微斗数战略顾问。你必须严格遵守以下心法和作业程序进行分析。
+
+═══ 第一部分：核心底层判定心法 ═══
+
+1. 物理环境论：宫位不是宿命，而是"物理背景"。地支定义能量的浓淡与方向（如子为隐溺、午为发散），主星是该背景下的具体物象。
+2. 细化太极原则：拒绝大而化之的吉凶。必须将问题拆解到最小颗粒度。问财看现金流（财帛）与库位（田宅）；问事看执行力（官禄）与外部阻力（迁移）。
+3. 化忌本质论：化忌不是"凶"，而是"能量的黑洞、执念与必须支付的对价"。忌所在之处是物理上的"不平衡点"，也是翻盘的爆破点。
+4. 星曜互涉效应：没有孤立的星曜。双星同宫、对宫冲照、三方四正构成的"物理闭环"才是定性的依据。
+
+═══ 第二部分：解盘标准作业程序 ═══
+
+第一阶段：定盘与底层架构扫描
+1. 扫描来因宫：确定此生能量的发端（如来因在福德则一生受精神驱动；在兄弟则受现金流和同辈影响）。
+2. 定性命身宫：命宫为先天性格（物理初速），身宫为后天修正（物理轨道）。若命空身实则前半生漂浮后半生落地。
+3. 生年四化落位：这是盘面的"气候背景"。禄是资源，权是掌控，科是名声，忌是欠债。
+
+第二阶段：事业与财帛专项断事
+1. 事业（官禄宫）判定依据：
+   - 物理属性匹配：天机/太阴/空劫适配虚拟、创意、轻资产、互联网。武曲/七杀/擎羊适配实业、技术、金融。天梁/紫微/廉贞适配咨询、管理、法律、体制内。
+   - 变动预判：官禄宫见马或冲代表职场物理位置频繁移动。
+2. 财帛与田宅（财富流向）判定依据：
+   - 现金流（财帛宫）：天同主慢水长流，武曲主金属入账。财帛宫坐忌代表求财有物理阻力，适合"技术换钱"。
+   - 库位（田宅宫）：田宅若破（见破军、空劫），进水再多无法沉淀。财富爆发点通常出现在流年禄/大限禄打入田宅宫的时刻。
+
+第三阶段：动态时空转换（大限与流年）
+1. 大限移位：每十年更换物理背景。重点看大限干引发的四化如何冲动原局痛点。
+2. 流年爆破：流年四化与生年四化重叠的宫位即为该年的"物理事件发生点"。"禄逢冲破"为大凶，"忌转禄"为大吉。
+
+═══ 第三部分：吉凶星与四化认知心法 ═══
+
+化忌深度应用：忌入父母/疾厄主文书纠纷或身体过载。忌入夫妻/交友代表能量被他人抽干。忌在对宫冲则为物理排斥力，冲哪哪里就是禁区。
+
+煞星工具化思维：擎羊为手术刀或切口。火星/铃星为突发爆破力，火贪格主横发但物理背景须在墓库位才能守住。地空/地劫为"反物质"，适合非物质文明。
+
+═══ 输出要求 ═══
+
+按以下五个模块输出，每个模块标题用【】包裹：
+
+【命局】命局底层逻辑，该盘的物理天花板在哪里。
+【自我与关系】自我关系与他人关系分析。
+【事业与财富】事业/财帛分析，适不适合做某事，钱从哪条管道来。
+【运势】大限流年能量波动，什么时候是爆破点，什么时候是清算期。
+【提醒】针对性解决方案，如何利用煞星，如何回避化忌。
+
+风格要求：硬核、确定、专业犀利。像阅历丰富说话直接的老军师。禁止空泛鼓励和情绪价值废话。每一句都要有信息量。总字数控制在1000字内。`;
+
+function getQuestionPrompt() {
+    const now = new Date();
+    return `你现在是"二狗军师"，一位顶级紫微斗数战略顾问。用户有一个具体问题需要你结合盘面数据来解答。当前时间：${now.getFullYear()}年${now.getMonth()+1}月。
+
+你必须严格按以下四步结构输出：
+
+【定位】确定这个问题的重点属于哪一个宫位，从命格底色和该宫位的星曜组合去解释问题的底层逻辑。不要泛泛而谈，直接锁定核心宫位和核心矛盾。
+
+【时间窗口】爆破点推演——结合大限和流年的时空转换，给出具体的时间节点。哪个阶段是机会窗口，哪个阶段要收缩防守，必须给出明确判断。
+
+【黑洞定位】化忌与痛点——点出用户最担心或最容易踩坑的地方。忌在哪里冲哪里，物理上的排斥力指向什么具体事件。不回避，不模糊。
+
+【破局指令】实操建议——可执行的具体动作。利用什么星曜的能量，回避什么宫位的陷阱，在什么时间点做什么事。
+
+风格要求：
+- 硬核感和确定感，不要有纯鼓励或者纯粹情绪价值的废话
+- 每一句话都必须有信息量
+- 像一个身经百战的军师在发号施令
+- 总字数控制在800字内`;
+}
+
+/* ═══════════════════════════════════════════
+   DeepSeek API
+   ═══════════════════════════════════════════ */
+const DS_KEY = "sk-e929f9505b6742afbf1826936dcec69a";
+
+async function callDeepSeek(systemPrompt, userContent) {
+    const res = await fetch("https://api.deepseek.com/chat/completions", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "Authorization": "Bearer " + DS_KEY },
+        body: JSON.stringify({
+            model: "deepseek-chat",
+            messages: [
+                { role: "system", content: systemPrompt },
+                { role: "user", content: userContent }
+            ]
+        })
+    });
+    const data = await res.json();
+    return data.choices?.[0]?.message?.content || '军师暂时语塞，请稍后再试。';
+}
+
+/* ═══════════════════════════════════════════
+   Typewriter
+   ═══════════════════════════════════════════ */
+function typeWriter(text, el, callback) {
+    el.innerHTML = '';
+    let i = 0;
+    function tick() {
+        if (i < text.length) {
+            el.innerHTML = text.slice(0, i + 1) + '<span class="cursor">▌</span>';
+            i++;
+            setTimeout(tick, 20);
+        } else {
+            el.innerHTML = text;
+            if (callback) callback();
+        }
+    }
+    tick();
+}
+
+/* ═══════════════════════════════════════════
+   Page Navigation
+   ═══════════════════════════════════════════ */
+function showPage(name) {
+    document.getElementById('page-input').classList.add('hidden');
+    document.getElementById('page-analysis').classList.add('hidden');
+    document.getElementById('page-answer').classList.add('hidden');
+    document.getElementById('page-' + name).classList.remove('hidden');
+    window.scrollTo(0, 0);
+}
+
+let globalChartData = '';
+
+/* ═══════════════════════════════════════════
+   Step 1 → Analysis
+   ═══════════════════════════════════════════ */
+async function handleStep1() {
+    if (!iztroReady) {
+        alert("算法库加载中或加载失败。请尝试：\n1. 刷新页面\n2. 检查网络连接\n3. 关闭VPN/代理");
+        return;
+    }
+    const dt = document.getElementById('datetime').value;
+    const prov = document.getElementById('province').value;
+    const ct = document.getElementById('city').value;
+    if (!dt || !prov || !ct) { alert("请完整选择时间与地点"); return; }
 
     try {
-        const parts = datetimeVal.split('T');
-        const hourParts = parts[1].split(':');
-        const timeIdx = Math.floor((parseInt(hourParts[0], 10) + 1) % 24 / 2);
+        const [datePart, timePart] = dt.split('T');
+        const hour = parseInt(timePart.split(':')[0], 10);
+        const idx = Math.floor(((hour + 1) % 24) / 2);
         const gender = document.getElementById('gender').value;
-        
-        // 调用引擎
-        globalAstrolabe = engine.astro.bySolar(parts[0], timeIdx, gender, true, 'zh-CN');
+        const astro = window.iztro.astro.bySolar(datePart, idx, gender, true, 'zh-CN');
 
-        const ming = globalAstrolabe.palaces.find(p => p.name === '命宫');
-        const laiin = globalAstrolabe.palaces.find(p => p.isComingPalace)?.name || "命宫";
-        const guan = globalAstrolabe.palaces.find(p => p.name === '官禄宫');
-        const cai = globalAstrolabe.palaces.find(p => p.name === '财帛宫');
+        // Build chart data
+        const laiin = astro.palaces.find(p => p.isComingPalace)?.name || '命宫';
+        let cd = '性别：' + astro.gender + '，来因宫：' + laiin + '\n\n';
+        astro.palaces.forEach(p => {
+            const ms = p.majorStars.map(s => s.name + (s.mutagen ? '[生年' + s.mutagen + ']' : '')).join('、');
+            const ns = p.minorStars.map(s => s.name).join('、');
+            cd += p.name + '(' + (p.heavenlyStem||'') + p.earthlyBranch + ')：主星[' + (ms||'空') + ']，辅星[' + (ns||'无') + ']，大限[' + p.decadal.range[0] + '-' + p.decadal.range[1] + ']\n';
+        });
+        globalChartData = cd;
 
-        let reportHtml = `<strong>军师初步扫描：</strong><br><br>`;
-        reportHtml += `• 能量发端：来因在【${laiin}】，主导一生核心驱动物理背景。<br>`;
-        reportHtml += `• 命局底色：命宫位于【${ming.earthlyBranch}】，主星[${ming.majorStars.map(s=>s.name).join('、')||'空'}]。<br>`;
-        reportHtml += `• 重点领域：官禄位坐[${guan.majorStars.map(s=>s.name).join('、')}]，财帛位坐[${cai.majorStars.map(s=>s.name).join('、')}]。`;
+        // Show page 2 with loading
+        showPage('analysis');
+        document.getElementById('analysis-loading').classList.remove('hidden');
+        document.getElementById('analysis-content').classList.add('hidden');
 
-        document.getElementById('quick-sop-report').innerHTML = reportHtml;
-        document.getElementById('step1').style.display = 'none';
-        document.getElementById('step2').style.display = 'block';
-        window.scrollTo(0,0);
+        const reply = await callDeepSeek(ANALYSIS_PROMPT, '以下是该用户的紫微斗数完整盘面数据，请按照标准作业程序进行全盘分析：\n\n' + cd);
+
+        document.getElementById('analysis-loading').classList.add('hidden');
+        document.getElementById('analysis-content').classList.remove('hidden');
+
+        typeWriter(reply, document.getElementById('analysis-text'), function() {
+            document.getElementById('question-section').classList.remove('hidden');
+            document.getElementById('analysis-back').classList.remove('hidden');
+        });
+
     } catch (e) {
-        alert("解析失败，请确保选择了完整的时间");
+        alert("解析失败：" + e.message);
     }
 }
 
-async function startAIEngine() {
-    const question = document.getElementById('question').value;
-    if(!question) return alert("请描述您的问题");
-    document.getElementById('step2').style.display = 'none';
-    document.getElementById('loading-msg').style.display = 'block';
+/* ═══════════════════════════════════════════
+   Step 2 → Answer
+   ═══════════════════════════════════════════ */
+async function handleAsk() {
+    const q = document.getElementById('question').value.trim();
+    if (!q) { alert("请描述您的问题"); return; }
+
+    showPage('answer');
+    document.getElementById('answer-loading').classList.remove('hidden');
+    document.getElementById('answer-content').classList.add('hidden');
 
     try {
-        let chartData = `性别：${globalAstrolabe.gender}，来因：${globalAstrolabe.palaces.find(p=>p.isComingPalace)?.name}\n`;
-        globalAstrolabe.palaces.forEach(p => {
-            const ms = p.majorStars.map(s => s.name + (s.mutagen ? `[生年${s.mutagen}]` : '')).join('、');
-            const ns = p.minorStars.map(s => s.name).join('、');
-            chartData += `- ${p.name}(${p.earthlyBranch}): [${ms||'空'}] + [${ns}]，大限[${p.decadal.range[0]}-${p.decadal.range[1]}]\n`;
+        const reply = await callDeepSeek(
+            getQuestionPrompt(),
+            '【用户问题】\n' + q + '\n\n【紫微斗数盘面数据】\n' + globalChartData
+        );
+
+        document.getElementById('answer-loading').classList.add('hidden');
+        document.getElementById('answer-content').classList.remove('hidden');
+
+        typeWriter(reply, document.getElementById('answer-text'), function() {
+            document.getElementById('referral-section').classList.remove('hidden');
+            document.getElementById('answer-links').classList.remove('hidden');
         });
 
-        const systemPrompt = `你现在是“二狗军师”，顶级战略顾问。严格遵守物理环境论、化忌本质论。禁止废话。结构：1.命局底色 2.傲人优势 3.黑洞风险 4.时间窗口 5.破局指令。字数1000字内，专业犀利。`;
-        const API_KEY = "sk-e929f9505b6742afbf1826936dcec69a";
-
-        const response = await fetch("https://api.deepseek.com/chat/completions", {
-            method: "POST",
-            headers: { "Content-Type": "application/json", "Authorization": `Bearer ${API_KEY}` },
-            body: JSON.stringify({
-                model: "deepseek-chat",
-                messages: [{role:"system", content:systemPrompt}, {role:"user", content:`问题：${question}\n数据：${chartData}`}]
-            })
-        });
-
-        const result = await response.json();
-        const aiAnswer = result.choices[0].message.content;
-        document.getElementById('loading-msg').style.display = 'none';
-        document.getElementById('ai-response-container').style.display = 'block';
-        const content = document.getElementById('answer-content');
-        
-        let i = 0;
-        function typeWriter() {
-            if (i < aiAnswer.length) {
-                content.innerHTML += aiAnswer.charAt(i); i++; setTimeout(typeWriter, 25);
-            } else {
-                document.getElementById('private-referral').style.display = 'block';
-            }
-        }
-        typeWriter();
-    } catch (error) {
-        alert("咨询失败：" + error.message);
-        document.getElementById('step2').style.display = 'block';
-        document.getElementById('loading-msg').style.display = 'none';
+    } catch (e) {
+        document.getElementById('answer-loading').classList.add('hidden');
+        document.getElementById('answer-content').classList.remove('hidden');
+        document.getElementById('answer-text').textContent = '军师遇到了一点小麻烦，请稍后再试。';
+        document.getElementById('answer-links').classList.remove('hidden');
     }
+}
+
+/* ═══════════════════════════════════════════
+   Utils
+   ═══════════════════════════════════════════ */
+function reset() {
+    showPage('input');
+    globalChartData = '';
+    document.getElementById('question').value = '';
+    document.getElementById('analysis-text').innerHTML = '';
+    document.getElementById('answer-text').innerHTML = '';
+    document.getElementById('question-section').classList.add('hidden');
+    document.getElementById('analysis-back').classList.add('hidden');
+    document.getElementById('referral-section').classList.add('hidden');
+    document.getElementById('answer-links').classList.add('hidden');
+}
+
+function backToQuestion() {
+    showPage('analysis');
+    document.getElementById('analysis-loading').classList.add('hidden');
+    document.getElementById('analysis-content').classList.remove('hidden');
+    document.getElementById('question-section').classList.remove('hidden');
+    document.getElementById('analysis-back').classList.remove('hidden');
+    document.getElementById('question').value = '';
+    document.getElementById('answer-text').innerHTML = '';
+    document.getElementById('referral-section').classList.add('hidden');
+    document.getElementById('answer-links').classList.add('hidden');
+}
+
+function copyWx() {
+    navigator.clipboard.writeText('debut24').then(function() {
+        document.getElementById('copy-btn').textContent = '已复制';
+        setTimeout(function() { document.getElementById('copy-btn').textContent = '复制'; }, 2000);
+    });
 }
 </script>
 </body>

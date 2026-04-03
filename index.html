@@ -20,6 +20,8 @@
         textarea::placeholder { color: #bbb; }
         .btn { width: 100%; background: var(--accent); color: #fff; border: none; padding: 18px; font-size: 14px; letter-spacing: 2px; cursor: pointer; transition: all .3s; }
         .btn:active { opacity: 0.8; transform: scale(0.98); }
+        .btn-retry { background: transparent; border: 1px solid var(--steel); color: #888; padding: 10px; font-size: 12px; letter-spacing: 1px; cursor: pointer; margin-top: 8px; width: 100%; }
+        .btn-retry:active { opacity: 0.7; }
         .response { background: #fff; padding: 35px 25px; border-top: 4px solid var(--accent); margin-top: 20px; }
         .greeting { font-weight: bold; font-size: 16px; margin-bottom: 20px; color: var(--red); letter-spacing: 1px; }
         .answer { font-size: 15px; line-height: 2; color: #333; white-space: pre-wrap; text-align: justify; }
@@ -65,6 +67,7 @@
 
     <button class="btn" onclick="handleStep1()">先简单看看</button>
     <div id="iztro-status" class="status-msg" style="color:#aaa;">算法引擎加载中...</div>
+    <button id="retry-btn" class="btn-retry hidden" onclick="retryLoadIztro()">重新加载算法引擎</button>
 </div>
 
 <!-- ══════════ PAGE 2: Analysis + Question ══════════ -->
@@ -122,127 +125,140 @@
 /* ═══════════════════════════════════════════
    DATA
    ═══════════════════════════════════════════ */
-const cityData = {"北京":["东城区","西城区","朝阳区","海淀区","丰台区","石景山区","通州区","顺义区","昌平区","大兴区"],"上海":["黄浦区","徐汇区","长宁区","静安区","普陀区","虹口区","杨浦区","浦东新区","闵行区","宝山区"],"广东":["广州","深圳","珠海","汕头","佛山","江门","湛江","东莞","中山","惠州"],"浙江":["杭州","宁波","温州","嘉兴","湖州","绍兴","金华","台州"],"江苏":["南京","无锡","徐州","常州","苏州","南通","扬州","镇江"],"四川":["成都","自贡","德阳","绵阳","广元","乐山","宜宾"],"湖北":["武汉","黄石","十堰","宜昌","襄阳","荆州"],"湖南":["长沙","株洲","湘潭","衡阳","邵阳","岳阳"],"福建":["福州","厦门","莆田","泉州","漳州"],"山东":["济南","青岛","淄博","枣庄","烟台","潍坊","威海"],"河南":["郑州","开封","洛阳","南阳","信阳","许昌"],"河北":["石家庄","唐山","秦皇岛","保定","邯郸"],"辽宁":["沈阳","大连","鞍山","抚顺","本溪"],"吉林":["长春","吉林","四平","松原"],"黑龙江":["哈尔滨","齐齐哈尔","大庆","牡丹江"],"安徽":["合肥","芜湖","蚌埠","马鞍山","安庆"],"江西":["南昌","景德镇","萍乡","九江"],"陕西":["西安","铜川","宝鸡","咸阳","渭南"],"山西":["太原","大同","阳泉","长治"],"重庆":["渝中区","江北区","南岸区","沙坪坝区","九龙坡区"],"天津":["和平区","河东区","河西区","南开区","河北区"],"云南":["昆明","曲靖","玉溪","大理","丽江"],"贵州":["贵阳","六盘水","遵义"],"广西":["南宁","柳州","桂林","北海"],"海南":["海口","三亚"],"甘肃":["兰州","嘉峪关","天水"],"内蒙古":["呼和浩特","包头","赤峰"],"新疆":["乌鲁木齐","克拉玛依","吐鲁番"],"西藏":["拉萨","日喀则"],"青海":["西宁","海东"],"宁夏":["银川","石嘴山"],"香港":["香港"],"澳门":["澳门"],"台湾":["台北","高雄","台中","台南"]};
+var cityData = {"北京":["东城区","西城区","朝阳区","海淀区","丰台区","石景山区","通州区","顺义区","昌平区","大兴区"],"上海":["黄浦区","徐汇区","长宁区","静安区","普陀区","虹口区","杨浦区","浦东新区","闵行区","宝山区"],"广东":["广州","深圳","珠海","汕头","佛山","江门","湛江","东莞","中山","惠州"],"浙江":["杭州","宁波","温州","嘉兴","湖州","绍兴","金华","台州"],"江苏":["南京","无锡","徐州","常州","苏州","南通","扬州","镇江"],"四川":["成都","自贡","德阳","绵阳","广元","乐山","宜宾"],"湖北":["武汉","黄石","十堰","宜昌","襄阳","荆州"],"湖南":["长沙","株洲","湘潭","衡阳","邵阳","岳阳"],"福建":["福州","厦门","莆田","泉州","漳州"],"山东":["济南","青岛","淄博","枣庄","烟台","潍坊","威海"],"河南":["郑州","开封","洛阳","南阳","信阳","许昌"],"河北":["石家庄","唐山","秦皇岛","保定","邯郸"],"辽宁":["沈阳","大连","鞍山","抚顺","本溪"],"吉林":["长春","吉林","四平","松原"],"黑龙江":["哈尔滨","齐齐哈尔","大庆","牡丹江"],"安徽":["合肥","芜湖","蚌埠","马鞍山","安庆"],"江西":["南昌","景德镇","萍乡","九江"],"陕西":["西安","铜川","宝鸡","咸阳","渭南"],"山西":["太原","大同","阳泉","长治"],"重庆":["渝中区","江北区","南岸区","沙坪坝区","九龙坡区"],"天津":["和平区","河东区","河西区","南开区","河北区"],"云南":["昆明","曲靖","玉溪","大理","丽江"],"贵州":["贵阳","六盘水","遵义"],"广西":["南宁","柳州","桂林","北海"],"海南":["海口","三亚"],"甘肃":["兰州","嘉峪关","天水"],"内蒙古":["呼和浩特","包头","赤峰"],"新疆":["乌鲁木齐","克拉玛依","吐鲁番"],"西藏":["拉萨","日喀则"],"青海":["西宁","海东"],"宁夏":["银川","石嘴山"],"香港":["香港"],"澳门":["澳门"],"台湾":["台北","高雄","台中","台南"]};
 
-// Init province select
-const provSel = document.getElementById('province');
-for (let p in cityData) { let o = document.createElement('option'); o.value = p; o.textContent = p; provSel.appendChild(o); }
+var provSel = document.getElementById('province');
+for (var p in cityData) { var o = document.createElement('option'); o.value = p; o.textContent = p; provSel.appendChild(o); }
 
 function updateCities() {
-    const p = provSel.value;
-    const c = document.getElementById('city');
+    var p = provSel.value;
+    var c = document.getElementById('city');
     c.innerHTML = '<option value="">城市</option>';
-    if (p && cityData[p]) cityData[p].forEach(s => { let o = document.createElement('option'); o.value = s; o.textContent = s; c.appendChild(o); });
+    if (p && cityData[p]) cityData[p].forEach(function(s) { var o = document.createElement('option'); o.value = s; o.textContent = s; c.appendChild(o); });
 }
 
 /* ═══════════════════════════════════════════
-   iztro Multi-CDN Loader
+   iztro Multi-CDN Loader (8 sources)
    ═══════════════════════════════════════════ */
-const IZTRO_CDNS = [
+var IZTRO_CDNS = [
+    // 国内 CDN - 最新版本
+    'https://cdn.bootcdn.net/ajax/libs/iztro/2.5.3/iztro.min.js',
+    'https://cdn.staticfile.net/iztro/2.5.3/iztro.min.js',
+    // 国内 CDN - 你之前用的版本
     'https://cdn.bootcdn.net/ajax/libs/iztro/1.4.1/iztro.min.js',
     'https://cdn.staticfile.net/iztro/1.4.1/iztro.min.js',
+    // 国际 CDN（部分地区可访问）
+    'https://cdn.jsdelivr.net/npm/iztro@2.5.3/dist/iztro.min.js',
     'https://cdn.jsdelivr.net/npm/iztro@1.4.1/dist/iztro.min.js',
+    'https://unpkg.com/iztro@2.5.3/dist/iztro.min.js',
     'https://unpkg.com/iztro@1.4.1/dist/iztro.min.js',
 ];
-let iztroReady = false;
 
-(function loadIztro(idx) {
-    if (idx >= IZTRO_CDNS.length) {
-        document.getElementById('iztro-status').textContent = '算法引擎加载失败，请刷新页面重试';
-        document.getElementById('iztro-status').style.color = '#c00';
-        return;
-    }
-    const s = document.createElement('script');
-    s.src = IZTRO_CDNS[idx];
-    s.onload = function() {
-        if (window.iztro) {
-            iztroReady = true;
-            document.getElementById('iztro-status').style.display = 'none';
-        } else {
-            loadIztro(idx + 1);
+var iztroReady = false;
+var iztroLoading = false;
+
+function loadIztro() {
+    if (iztroReady || iztroLoading) return;
+    iztroLoading = true;
+
+    var statusEl = document.getElementById('iztro-status');
+    var retryEl = document.getElementById('retry-btn');
+    statusEl.textContent = '算法引擎加载中...';
+    statusEl.style.color = '#aaa';
+    statusEl.style.display = 'block';
+    retryEl.classList.add('hidden');
+
+    var idx = 0;
+    var tried = [];
+
+    function tryNext() {
+        if (idx >= IZTRO_CDNS.length) {
+            iztroLoading = false;
+            statusEl.textContent = '算法引擎加载失败（已尝试' + tried.length + '个源）';
+            statusEl.style.color = '#c00';
+            retryEl.classList.remove('hidden');
+            console.error('iztro load failed. Tried:', tried);
+            return;
         }
-    };
-    s.onerror = function() { loadIztro(idx + 1); };
-    document.head.appendChild(s);
-})(0);
+        var url = IZTRO_CDNS[idx];
+        tried.push(url);
+        idx++;
+
+        statusEl.textContent = '正在尝试第' + idx + '个源加载...';
+
+        // 清理之前可能失败的 script 标签
+        var s = document.createElement('script');
+        s.src = url;
+        s.timeout = 8000; // 超时标记
+
+        var timer = setTimeout(function() {
+            s.onload = s.onerror = null;
+            console.warn('Timeout: ' + url);
+            tryNext();
+        }, 8000);
+
+        s.onload = function() {
+            clearTimeout(timer);
+            if (window.iztro && (window.iztro.astro || (window.iztro.default && window.iztro.default.astro))) {
+                iztroReady = true;
+                iztroLoading = false;
+                statusEl.style.display = 'none';
+                retryEl.classList.add('hidden');
+                console.log('iztro loaded from: ' + url);
+            } else {
+                console.warn('iztro object not found after loading: ' + url);
+                tryNext();
+            }
+        };
+        s.onerror = function() {
+            clearTimeout(timer);
+            console.warn('Failed: ' + url);
+            tryNext();
+        };
+        document.head.appendChild(s);
+    }
+
+    tryNext();
+}
+
+function retryLoadIztro() {
+    iztroLoading = false;
+    iztroReady = false;
+    loadIztro();
+}
+
+// 开始加载
+loadIztro();
+
+/* ═══════════════════════════════════════════
+   获取 iztro.astro（兼容不同版本）
+   ═══════════════════════════════════════════ */
+function getAstroEngine() {
+    if (!window.iztro) return null;
+    // v2.x: iztro.astro
+    if (window.iztro.astro) return window.iztro.astro;
+    // 某些打包: iztro.default.astro
+    if (window.iztro.default && window.iztro.default.astro) return window.iztro.default.astro;
+    return null;
+}
 
 /* ═══════════════════════════════════════════
    PROMPTS
    ═══════════════════════════════════════════ */
-const ANALYSIS_PROMPT = `你现在是"二狗军师"，一位顶级紫微斗数战略顾问。你必须严格遵守以下心法和作业程序进行分析。
-
-═══ 第一部分：核心底层判定心法 ═══
-
-1. 物理环境论：宫位不是宿命，而是"物理背景"。地支定义能量的浓淡与方向（如子为隐溺、午为发散），主星是该背景下的具体物象。
-2. 细化太极原则：拒绝大而化之的吉凶。必须将问题拆解到最小颗粒度。问财看现金流（财帛）与库位（田宅）；问事看执行力（官禄）与外部阻力（迁移）。
-3. 化忌本质论：化忌不是"凶"，而是"能量的黑洞、执念与必须支付的对价"。忌所在之处是物理上的"不平衡点"，也是翻盘的爆破点。
-4. 星曜互涉效应：没有孤立的星曜。双星同宫、对宫冲照、三方四正构成的"物理闭环"才是定性的依据。
-
-═══ 第二部分：解盘标准作业程序 ═══
-
-第一阶段：定盘与底层架构扫描
-1. 扫描来因宫：确定此生能量的发端（如来因在福德则一生受精神驱动；在兄弟则受现金流和同辈影响）。
-2. 定性命身宫：命宫为先天性格（物理初速），身宫为后天修正（物理轨道）。若命空身实则前半生漂浮后半生落地。
-3. 生年四化落位：这是盘面的"气候背景"。禄是资源，权是掌控，科是名声，忌是欠债。
-
-第二阶段：事业与财帛专项断事
-1. 事业（官禄宫）判定依据：
-   - 物理属性匹配：天机/太阴/空劫适配虚拟、创意、轻资产、互联网。武曲/七杀/擎羊适配实业、技术、金融。天梁/紫微/廉贞适配咨询、管理、法律、体制内。
-   - 变动预判：官禄宫见马或冲代表职场物理位置频繁移动。
-2. 财帛与田宅（财富流向）判定依据：
-   - 现金流（财帛宫）：天同主慢水长流，武曲主金属入账。财帛宫坐忌代表求财有物理阻力，适合"技术换钱"。
-   - 库位（田宅宫）：田宅若破（见破军、空劫），进水再多无法沉淀。财富爆发点通常出现在流年禄/大限禄打入田宅宫的时刻。
-
-第三阶段：动态时空转换（大限与流年）
-1. 大限移位：每十年更换物理背景。重点看大限干引发的四化如何冲动原局痛点。
-2. 流年爆破：流年四化与生年四化重叠的宫位即为该年的"物理事件发生点"。"禄逢冲破"为大凶，"忌转禄"为大吉。
-
-═══ 第三部分：吉凶星与四化认知心法 ═══
-
-化忌深度应用：忌入父母/疾厄主文书纠纷或身体过载。忌入夫妻/交友代表能量被他人抽干。忌在对宫冲则为物理排斥力，冲哪哪里就是禁区。
-
-煞星工具化思维：擎羊为手术刀或切口。火星/铃星为突发爆破力，火贪格主横发但物理背景须在墓库位才能守住。地空/地劫为"反物质"，适合非物质文明。
-
-═══ 输出要求 ═══
-
-按以下五个模块输出，每个模块标题用【】包裹：
-
-【命局】命局底层逻辑，该盘的物理天花板在哪里。
-【自我与关系】自我关系与他人关系分析。
-【事业与财富】事业/财帛分析，适不适合做某事，钱从哪条管道来。
-【运势】大限流年能量波动，什么时候是爆破点，什么时候是清算期。
-【提醒】针对性解决方案，如何利用煞星，如何回避化忌。
-
-风格要求：硬核、确定、专业犀利。像阅历丰富说话直接的老军师。禁止空泛鼓励和情绪价值废话。每一句都要有信息量。总字数控制在1000字内。`;
+var ANALYSIS_PROMPT = '你现在是"二狗军师"，一位顶级紫微斗数战略顾问。你必须严格遵守以下心法和作业程序进行分析。\n\n═══ 第一部分：核心底层判定心法 ═══\n\n1. 物理环境论：宫位不是宿命，而是"物理背景"。地支定义能量的浓淡与方向（如子为隐溺、午为发散），主星是该背景下的具体物象。\n2. 细化太极原则：拒绝大而化之的吉凶。必须将问题拆解到最小颗粒度。问财看现金流（财帛）与库位（田宅）；问事看执行力（官禄）与外部阻力（迁移）。\n3. 化忌本质论：化忌不是"凶"，而是"能量的黑洞、执念与必须支付的对价"。忌所在之处是物理上的"不平衡点"，也是翻盘的爆破点。\n4. 星曜互涉效应：没有孤立的星曜。双星同宫、对宫冲照、三方四正构成的"物理闭环"才是定性的依据。\n\n═══ 第二部分：解盘标准作业程序 ═══\n\n第一阶段：定盘与底层架构扫描\n1. 扫描来因宫：确定此生能量的发端（如来因在福德则一生受精神驱动；在兄弟则受现金流和同辈影响）。\n2. 定性命身宫：命宫为先天性格（物理初速），身宫为后天修正（物理轨道）。若命空身实则前半生漂浮后半生落地。\n3. 生年四化落位：这是盘面的"气候背景"。禄是资源，权是掌控，科是名声，忌是欠债。\n\n第二阶段：事业与财帛专项断事\n1. 事业（官禄宫）判定依据：\n   - 物理属性匹配：天机/太阴/空劫适配虚拟、创意、轻资产、互联网。武曲/七杀/擎羊适配实业、技术、金融。天梁/紫微/廉贞适配咨询、管理、法律、体制内。\n   - 变动预判：官禄宫见马或冲代表职场物理位置频繁移动。\n2. 财帛与田宅（财富流向）判定依据：\n   - 现金流（财帛宫）：天同主慢水长流，武曲主金属入账。财帛宫坐忌代表求财有物理阻力，适合"技术换钱"。\n   - 库位（田宅宫）：田宅若破（见破军、空劫），进水再多无法沉淀。财富爆发点通常出现在流年禄/大限禄打入田宅宫的时刻。\n\n第三阶段：动态时空转换（大限与流年）\n1. 大限移位：每十年更换物理背景。重点看大限干引发的四化如何冲动原局痛点。\n2. 流年爆破：流年四化与生年四化重叠的宫位即为该年的"物理事件发生点"。"禄逢冲破"为大凶，"忌转禄"为大吉。\n\n═══ 第三部分：吉凶星与四化认知心法 ═══\n\n化忌深度应用：忌入父母/疾厄主文书纠纷或身体过载。忌入夫妻/交友代表能量被他人抽干。忌在对宫冲则为物理排斥力，冲哪哪里就是禁区。\n\n煞星工具化思维：擎羊为手术刀或切口。火星/铃星为突发爆破力，火贪格主横发但物理背景须在墓库位才能守住。地空/地劫为"反物质"，适合非物质文明。\n\n═══ 输出要求 ═══\n\n按以下五个模块输出，每个模块标题用【】包裹：\n\n【命局】命局底层逻辑，该盘的物理天花板在哪里。\n【自我与关系】自我关系与他人关系分析。\n【事业与财富】事业/财帛分析，适不适合做某事，钱从哪条管道来。\n【运势】大限流年能量波动，什么时候是爆破点，什么时候是清算期。\n【提醒】针对性解决方案，如何利用煞星，如何回避化忌。\n\n风格要求：硬核、确定、专业犀利。像阅历丰富说话直接的老军师。禁止空泛鼓励和情绪价值废话。每一句都要有信息量。总字数控制在1000字内。';
 
 function getQuestionPrompt() {
-    const now = new Date();
-    return `你现在是"二狗军师"，一位顶级紫微斗数战略顾问。用户有一个具体问题需要你结合盘面数据来解答。当前时间：${now.getFullYear()}年${now.getMonth()+1}月。
-
-你必须严格按以下四步结构输出：
-
-【定位】确定这个问题的重点属于哪一个宫位，从命格底色和该宫位的星曜组合去解释问题的底层逻辑。不要泛泛而谈，直接锁定核心宫位和核心矛盾。
-
-【时间窗口】爆破点推演——结合大限和流年的时空转换，给出具体的时间节点。哪个阶段是机会窗口，哪个阶段要收缩防守，必须给出明确判断。
-
-【黑洞定位】化忌与痛点——点出用户最担心或最容易踩坑的地方。忌在哪里冲哪里，物理上的排斥力指向什么具体事件。不回避，不模糊。
-
-【破局指令】实操建议——可执行的具体动作。利用什么星曜的能量，回避什么宫位的陷阱，在什么时间点做什么事。
-
-风格要求：
-- 硬核感和确定感，不要有纯鼓励或者纯粹情绪价值的废话
-- 每一句话都必须有信息量
-- 像一个身经百战的军师在发号施令
-- 总字数控制在800字内`;
+    var now = new Date();
+    return '你现在是"二狗军师"，一位顶级紫微斗数战略顾问。用户有一个具体问题需要你结合盘面数据来解答。当前时间：' + now.getFullYear() + '年' + (now.getMonth()+1) + '月。\n\n你必须严格按以下四步结构输出：\n\n【定位】确定这个问题的重点属于哪一个宫位，从命格底色和该宫位的星曜组合去解释问题的底层逻辑。不要泛泛而谈，直接锁定核心宫位和核心矛盾。\n\n【时间窗口】爆破点推演——结合大限和流年的时空转换，给出具体的时间节点。哪个阶段是机会窗口，哪个阶段要收缩防守，必须给出明确判断。\n\n【黑洞定位】化忌与痛点——点出用户最担心或最容易踩坑的地方。忌在哪里冲哪里，物理上的排斥力指向什么具体事件。不回避，不模糊。\n\n【破局指令】实操建议——可执行的具体动作。利用什么星曜的能量，回避什么宫位的陷阱，在什么时间点做什么事。\n\n风格要求：\n- 硬核感和确定感，不要有纯鼓励或者纯粹情绪价值的废话\n- 每一句话都必须有信息量\n- 像一个身经百战的军师在发号施令\n- 总字数控制在800字内';
 }
 
 /* ═══════════════════════════════════════════
    DeepSeek API
    ═══════════════════════════════════════════ */
-const DS_KEY = "sk-e929f9505b6742afbf1826936dcec69a";
+var DS_KEY = "sk-e929f9505b6742afbf1826936dcec69a";
 
-async function callDeepSeek(systemPrompt, userContent) {
-    const res = await fetch("https://api.deepseek.com/chat/completions", {
+function callDeepSeek(systemPrompt, userContent) {
+    return fetch("https://api.deepseek.com/chat/completions", {
         method: "POST",
         headers: { "Content-Type": "application/json", "Authorization": "Bearer " + DS_KEY },
         body: JSON.stringify({
@@ -252,9 +268,17 @@ async function callDeepSeek(systemPrompt, userContent) {
                 { role: "user", content: userContent }
             ]
         })
+    })
+    .then(function(res) { return res.json(); })
+    .then(function(data) {
+        if (data.choices && data.choices[0] && data.choices[0].message) {
+            return data.choices[0].message.content;
+        }
+        if (data.error) {
+            throw new Error(data.error.message || 'API返回错误');
+        }
+        return '军师暂时语塞，请稍后再试。';
     });
-    const data = await res.json();
-    return data.choices?.[0]?.message?.content || '军师暂时语塞，请稍后再试。';
 }
 
 /* ═══════════════════════════════════════════
@@ -262,7 +286,7 @@ async function callDeepSeek(systemPrompt, userContent) {
    ═══════════════════════════════════════════ */
 function typeWriter(text, el, callback) {
     el.innerHTML = '';
-    let i = 0;
+    var i = 0;
     function tick() {
         if (i < text.length) {
             el.innerHTML = text.slice(0, i + 1) + '<span class="cursor">▌</span>';
@@ -287,34 +311,40 @@ function showPage(name) {
     window.scrollTo(0, 0);
 }
 
-let globalChartData = '';
+var globalChartData = '';
 
 /* ═══════════════════════════════════════════
    Step 1 → Analysis
    ═══════════════════════════════════════════ */
-async function handleStep1() {
-    if (!iztroReady) {
-        alert("算法库加载中或加载失败。请尝试：\n1. 刷新页面\n2. 检查网络连接\n3. 关闭VPN/代理");
+function handleStep1() {
+    var engine = getAstroEngine();
+    if (!iztroReady || !engine) {
+        alert("算法库尚未加载成功。\n\n请尝试：\n1. 点击「重新加载算法引擎」按钮\n2. 切换到WiFi网络\n3. 关闭VPN/代理后刷新页面");
         return;
     }
-    const dt = document.getElementById('datetime').value;
-    const prov = document.getElementById('province').value;
-    const ct = document.getElementById('city').value;
+    var dt = document.getElementById('datetime').value;
+    var prov = document.getElementById('province').value;
+    var ct = document.getElementById('city').value;
     if (!dt || !prov || !ct) { alert("请完整选择时间与地点"); return; }
 
     try {
-        const [datePart, timePart] = dt.split('T');
-        const hour = parseInt(timePart.split(':')[0], 10);
-        const idx = Math.floor(((hour + 1) % 24) / 2);
-        const gender = document.getElementById('gender').value;
-        const astro = window.iztro.astro.bySolar(datePart, idx, gender, true, 'zh-CN');
+        var parts = dt.split('T');
+        var datePart = parts[0];
+        var timePart = parts[1];
+        var hour = parseInt(timePart.split(':')[0], 10);
+        var idx = Math.floor(((hour + 1) % 24) / 2);
+        var gender = document.getElementById('gender').value;
+        var astro = engine.bySolar(datePart, idx, gender, true, 'zh-CN');
 
         // Build chart data
-        const laiin = astro.palaces.find(p => p.isComingPalace)?.name || '命宫';
-        let cd = '性别：' + astro.gender + '，来因宫：' + laiin + '\n\n';
-        astro.palaces.forEach(p => {
-            const ms = p.majorStars.map(s => s.name + (s.mutagen ? '[生年' + s.mutagen + ']' : '')).join('、');
-            const ns = p.minorStars.map(s => s.name).join('、');
+        var laiin = '命宫';
+        for (var i = 0; i < astro.palaces.length; i++) {
+            if (astro.palaces[i].isComingPalace) { laiin = astro.palaces[i].name; break; }
+        }
+        var cd = '性别：' + astro.gender + '，来因宫：' + laiin + '\n\n';
+        astro.palaces.forEach(function(p) {
+            var ms = p.majorStars.map(function(s) { return s.name + (s.mutagen ? '[生年' + s.mutagen + ']' : ''); }).join('、');
+            var ns = p.minorStars.map(function(s) { return s.name; }).join('、');
             cd += p.name + '(' + (p.heavenlyStem||'') + p.earthlyBranch + ')：主星[' + (ms||'空') + ']，辅星[' + (ns||'无') + ']，大限[' + p.decadal.range[0] + '-' + p.decadal.range[1] + ']\n';
         });
         globalChartData = cd;
@@ -324,52 +354,53 @@ async function handleStep1() {
         document.getElementById('analysis-loading').classList.remove('hidden');
         document.getElementById('analysis-content').classList.add('hidden');
 
-        const reply = await callDeepSeek(ANALYSIS_PROMPT, '以下是该用户的紫微斗数完整盘面数据，请按照标准作业程序进行全盘分析：\n\n' + cd);
-
-        document.getElementById('analysis-loading').classList.add('hidden');
-        document.getElementById('analysis-content').classList.remove('hidden');
-
-        typeWriter(reply, document.getElementById('analysis-text'), function() {
-            document.getElementById('question-section').classList.remove('hidden');
+        callDeepSeek(ANALYSIS_PROMPT, '以下是该用户的紫微斗数完整盘面数据，请按照标准作业程序进行全盘分析：\n\n' + cd)
+        .then(function(reply) {
+            document.getElementById('analysis-loading').classList.add('hidden');
+            document.getElementById('analysis-content').classList.remove('hidden');
+            typeWriter(reply, document.getElementById('analysis-text'), function() {
+                document.getElementById('question-section').classList.remove('hidden');
+                document.getElementById('analysis-back').classList.remove('hidden');
+            });
+        })
+        .catch(function(err) {
+            document.getElementById('analysis-loading').classList.add('hidden');
+            document.getElementById('analysis-content').classList.remove('hidden');
+            document.getElementById('analysis-text').textContent = '军师遇到了一点小麻烦：' + err.message + '\n\n请检查网络后重试。';
             document.getElementById('analysis-back').classList.remove('hidden');
         });
 
     } catch (e) {
-        alert("解析失败：" + e.message);
+        alert("解析失败：" + e.message + "\n\n请确保选择了完整的时间和地点。");
     }
 }
 
 /* ═══════════════════════════════════════════
    Step 2 → Answer
    ═══════════════════════════════════════════ */
-async function handleAsk() {
-    const q = document.getElementById('question').value.trim();
+function handleAsk() {
+    var q = document.getElementById('question').value.trim();
     if (!q) { alert("请描述您的问题"); return; }
 
     showPage('answer');
     document.getElementById('answer-loading').classList.remove('hidden');
     document.getElementById('answer-content').classList.add('hidden');
 
-    try {
-        const reply = await callDeepSeek(
-            getQuestionPrompt(),
-            '【用户问题】\n' + q + '\n\n【紫微斗数盘面数据】\n' + globalChartData
-        );
-
+    callDeepSeek(getQuestionPrompt(), '【用户问题】\n' + q + '\n\n【紫微斗数盘面数据】\n' + globalChartData)
+    .then(function(reply) {
         document.getElementById('answer-loading').classList.add('hidden');
         document.getElementById('answer-content').classList.remove('hidden');
-
         typeWriter(reply, document.getElementById('answer-text'), function() {
             document.getElementById('referral-section').classList.remove('hidden');
             document.getElementById('answer-links').classList.remove('hidden');
         });
-
-    } catch (e) {
+    })
+    .catch(function(err) {
         document.getElementById('answer-loading').classList.add('hidden');
         document.getElementById('answer-content').classList.remove('hidden');
-        document.getElementById('answer-text').textContent = '军师遇到了一点小麻烦，请稍后再试。';
+        document.getElementById('answer-text').textContent = '军师遇到了一点小麻烦：' + err.message;
         document.getElementById('answer-links').classList.remove('hidden');
-    }
+    });
 }
 
 /* ═══════════════════════════════════════════
